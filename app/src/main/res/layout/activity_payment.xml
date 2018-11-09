@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_height="match_parent"
+    tools:context=".Payment">
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar_perfomance1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:textSize="18dp"
+            android:text="Payments"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent" />
+
+    </android.support.v7.widget.Toolbar>
+
+
+    <LinearLayout
+        android:weightSum="1"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    <LinearLayout
+        android:layout_weight="0.08"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:background="@color/flutter_blue"
+        android:layout_width="match_parent"
+        android:layout_height="0dp">
+        <TextView
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            android:textSize="20dp"
+            android:gravity="center"
+            android:text="Pay at Online"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent" />
+    <ImageView
+        android:layout_marginLeft="10dp"
+    android:src="@drawable/ic_credit_cards_payment"
+    android:layout_width="40dp"
+    android:layout_height="30dp" />
+    </LinearLayout>
+
+    <android.support.design.widget.TabLayout
+        android:layout_weight="0.08"
+        android:id="@+id/tabs1"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:tabMode="fixed"
+        app:tabGravity="fill"/>
+    <android.support.v4.view.ViewPager
+        android:layout_weight="0.76"
+        android:id="@+id/viewpager1"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"  />
+    <LinearLayout
+        android:layout_weight="0.08"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:background="@color/flutter_blue"
+        android:layout_width="match_parent"
+        android:layout_height="0dp">
+        <TextView
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            android:textSize="20dp"
+            android:gravity="center"
+            android:text="Submit"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent" />
+    </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

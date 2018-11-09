@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:visible="false"
+        android:icon="@drawable/ic_notificatio"
+        android:id="@+id/history1"
+        android:title=""
+        android:actionLayout="@layout/layout"
+        app:showAsAction="always" />
+    <item
+        android:menuCategory="container"
+        android:title=""
+        android:id="@+id/qrcode"
+        android:icon="@drawable/ic_qr_code"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:icon="@drawable/ic_shares"
+        android:id="@+id/history2"
+        android:title=""
+        app:showAsAction="ifRoom" />
+
+</menu>

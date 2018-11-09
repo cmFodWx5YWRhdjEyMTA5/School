@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/white"
+    android:clickable="true"
+    android:id="@+id/update"
+    android:gravity="center"
+    tools:context=".fragments.Validate">
+
+    <LinearLayout
+
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:layout_height="match_parent">
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_marginTop="30dp"
+            style="@style/LoginTextInputLayoutStyle"
+            android:background="@color/white1"
+            android:layout_width="match_parent"
+            android:layout_marginRight="5dp"
+            android:layout_marginLeft="5dp"
+            app:boxStrokeColor="@color/flutter_blue"
+            android:layout_height="wrap_content">
+
+
+            <EditText
+                android:id="@+id/otp"
+                android:inputType="number"
+                android:maxLength="4"
+                            android:textColor="@color/flutter_blue"
+                android:hint="Enter Otp"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:gravity="center"
+
+                android:background="@color/white1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </android.support.design.widget.TextInputLayout>
+        <android.support.design.widget.TextInputLayout
+            android:layout_marginTop="5dp"
+            style="@style/LoginTextInputLayoutStyle"
+                       android:background="@color/white1"
+            android:layout_width="match_parent"
+            android:layout_marginRight="5dp"
+            android:layout_marginLeft="5dp"
+            app:boxStrokeColor="@color/flutter_blue"
+            android:layout_height="wrap_content">
+
+
+            <EditText
+                android:id="@+id/enter"
+                     android:textColor="@color/flutter_blue"
+                android:hint="Enter new password"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:gravity="center"
+
+                android:background="@color/white1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </android.support.design.widget.TextInputLayout>
+        <android.support.design.widget.TextInputLayout
+            android:layout_marginTop="5dp"
+            style="@style/LoginTextInputLayoutStyle"
+
+            android:background="@color/white1"
+            android:layout_width="match_parent"
+            android:layout_marginRight="5dp"
+            android:layout_marginLeft="5dp"
+            app:boxStrokeColor="@color/flutter_blue"
+            android:layout_height="wrap_content">
+
+
+            <EditText
+                android:id="@+id/reenter"
+                android:textColor="@color/flutter_blue"
+                android:hint="Re-enter password"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:gravity="center"
+
+                android:background="@color/white1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/sendcode"
+            app:cardCornerRadius="4dp"
+            app:cardBackgroundColor="@color/flutter_blue"
+            android:layout_margin="10dp"
+            android:layout_width="280dp"
+
+            android:layout_marginTop="10dp"
+            android:layout_gravity="center"
+            android:layout_height="40dp">
+
+            <TextView
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:gravity="center"
+                android:textSize="17dp"
+                android:text="Update password"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+        </android.support.v7.widget.CardView>
+
+
+
+    </LinearLayout>
+
+
+
+</LinearLayout>

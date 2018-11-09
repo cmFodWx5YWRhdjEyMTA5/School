@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+      android:id="@+id/activity_main"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:fitsSystemWindows="true">
+    <LinearLayout
+        android:weightSum="3"
+        android:layout_width="match_parent"
+        android:layout_height="35dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_marginLeft="5dp"
+            android:layout_weight="1"
+            android:id="@+id/textforchart"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:minEms="3"
+            android:text="Low"
+            android:textStyle="bold" />
+        <com.video.aashi.school.adapters.BarView
+            android:layout_marginLeft="3dp"
+            android:id="@+id/low_bar"
+            android:layout_width="0dp"
+            android:layout_height="10dp"
+            android:layout_weight="1.5" />
+        <TextView
+            android:textSize="14dp"
+            android:layout_weight="0.4"
+            android:id="@+id/low_text"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:paddingLeft="16dp"
+            android:layout_marginRight="10dp"
+           />
+    </LinearLayout>
+
+</LinearLayout>

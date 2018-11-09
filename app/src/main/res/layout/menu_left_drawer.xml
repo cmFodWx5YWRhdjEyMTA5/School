@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:orientation="vertical">
+
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="50dp" />
+
+
+
+    <LinearLayout
+        android:layout_marginLeft="20dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:baselineAligned="false"
+        android:orientation="horizontal">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:src="@drawable/myimage"
+            android:layout_width="50dp"
+            android:layout_height="50dp" />
+        <TextView
+
+            android:id="@+id/name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginLeft="10dp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:text="Mohanraj"
+            android:textSize="18sp" />
+
+    </LinearLayout>
+
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="15dp" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/list"
+        android:layout_width="240dp"
+        android:layout_height="match_parent" />
+
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="40dp" />
+
+</LinearLayout>

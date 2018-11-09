@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="ld_activityScreenTitles">
+        <item>Dashboard</item>
+        <item>Attendance</item>
+        <item>Noticeboard</item>
+        <item>Timetable</item>
+        <item>Exam time table</item>
+        <item>Holidays</item>
+        <item>Memos </item>
+        <item>PTA Meetings </item>
+        <item>Homework</item>
+        <item>Invoice</item>
+        <item>Performance</item>
+        <item>Profile</item>
+        <item>Log Out</item>
+    </string-array>
+
+    <array name="ld_activityScreenIcons">
+        <item>@drawable/ic_home_icon_silhouette</item>
+        <item>@drawable/ic_checking_attendance</item>
+        <item>@drawable/ic_loud_speaker</item>
+        <item>@drawable/ic_calendar</item>
+        <item>@drawable/ic_boo</item>
+        <item>@drawable/ic_sun_umbrella</item>
+        <item>@drawable/ic_pad</item>
+        <item>@drawable/ic_meeting</item>
+        <item>@drawable/ic_study</item>
+        <item>@drawable/ic_bill</item>
+        <item>@drawable/ic_seo_performance_marketing_graphic</item>
+        <item>@drawable/ic_man_user</item>
+        <item>@drawable/ic_logout</item>
+    </array>
+
+</resources>

@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:weightSum="2"
+    android:orientation="vertical"
+    android:background="@color/white"
+    android:layout_height="match_parent"
+    tools:context=".ForgetPass">
+
+    <android.support.design.widget.CoordinatorLayout
+        android:layout_weight="1"
+        android:layout_width="match_parent"
+        android:layout_height="0dp">
+        <ImageView
+            android:padding="70dp"
+            android:src="@drawable/eazied_logo"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </android.support.design.widget.CoordinatorLayout>
+
+
+    <FrameLayout
+        android:id="@+id/mylayout"
+        android:layout_weight="1"
+        android:layout_width="match_parent"
+        android:layout_height="0dp">
+
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:layout_height="match_parent">
+        <android.support.design.widget.TextInputLayout
+            android:layout_marginTop="30dp"
+            style="@style/LoginTextInputLayoutStyle"
+
+            android:background="@color/white1"
+            android:padding="4dp"
+            android:layout_width="match_parent"
+            android:layout_marginRight="5dp"
+            android:layout_marginLeft="5dp"
+            app:boxStrokeColor="@color/flutter_blue"
+            android:layout_height="wrap_content">
+
+
+            <EditText
+                android:id="@+id/userid"
+                             android:textColor="@color/flutter_blue"
+                android:hint="Enter your user id"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:gravity="center"
+                android:background="@color/white1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                />
+        </android.support.design.widget.TextInputLayout>
+        <android.support.design.widget.TextInputLayout
+            android:layout_marginTop="10dp"
+            style="@style/LoginTextInputLayoutStyle"
+            android:id="@+id/username"
+            android:background="@color/white1"
+            android:padding="4dp"
+            android:layout_width="match_parent"
+            android:layout_marginRight="5dp"
+            android:layout_marginLeft="5dp"
+            app:boxStrokeColor="@color/flutter_blue"
+            android:layout_height="wrap_content">
+
+
+            <EditText
+                android:id="@+id/username1"
+                              android:textColor="@color/flutter_blue"
+                android:hint="Enter your email id"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:gravity="center"
+                android:background="@color/white1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                />
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/sendcode"
+            app:cardCornerRadius="4dp"
+            app:cardBackgroundColor="@color/flutter_blue"
+            android:layout_margin="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_width="280dp"
+            android:layout_gravity="center"
+            android:layout_height="40dp">
+
+            <TextView
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:gravity="center"
+                android:textSize="17dp"
+                android:text="Send Verification code"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+        </android.support.v7.widget.CardView>
+
+
+
+    </LinearLayout>
+    </FrameLayout>
+</LinearLayout>

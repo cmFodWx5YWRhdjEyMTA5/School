@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/alpha"
+    android:orientation="vertical"
+    android:alpha="1"
+    tools:context=".fragments.Memos">
+
+
+    <TextView
+        android:gravity="center"
+        android:text="NO MEMOS AVAILABLE"
+        android:id="@+id/nomemo"
+        android:textSize="18dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+
+        />
+
+
+<android.support.v7.widget.RecyclerView
+    android:id="@+id/mymemos"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+</android.support.v7.widget.RecyclerView>
+    <Button
+        android:visibility="gone"
+        android:id="@+id/viewmemo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/hello_blank_fragment" />
+
+</LinearLayout>

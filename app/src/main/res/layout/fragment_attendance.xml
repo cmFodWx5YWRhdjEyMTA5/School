@@ -1,0 +1,384 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:weightSum="1"
+    android:orientation="vertical"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".fragments.Attendace">
+
+
+    <LinearLayout
+        android:layout_weight="0.6"
+        android:layout_width="match_parent"
+        android:layout_height="0dp">
+
+        <com.prolificinteractive.materialcalendarview.MaterialCalendarView
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/mycalender"
+            app:mcv_calendarMode="month"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:mcv_showOtherDates="none"
+            app:mcv_selectionColor="#00F"
+            />
+    </LinearLayout>
+
+    <android.support.constraint.ConstraintLayout
+        android:visibility="gone"
+        android:layout_weight="0.1"
+        android:layout_width="match_parent"
+        android:layout_height="0dp">
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:gravity="center|right"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:layout_marginRight="10dp"
+                android:id="@+id/switches"
+                android:textSize="15dp"
+                android:text="Switch to week view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <Switch
+                android:layout_marginRight="10dp"
+                android:id="@+id/simpleSwitch"
+                android:checked="false"
+                android:theme="@style/SCBSwitch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+
+    </android.support.constraint.ConstraintLayout>
+
+
+    <LinearLayout
+        android:weightSum="6"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:layout_weight="0.4"
+        android:layout_width="match_parent"
+        android:layout_height="0dp">
+
+        <LinearLayout
+            android:id="@+id/click"
+            android:gravity="center"
+           android:layout_weight="1"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <LinearLayout
+                android:visibility="gone"
+                android:layout_marginLeft="10dp"
+                android:gravity="center"
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:background="@drawable/bg_circle1">
+            </LinearLayout>
+            <TextView
+                android:textColor="@color/navy"
+                android:textStyle="bold"
+                android:layout_marginLeft="10dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Present"
+                />
+             <LinearLayout
+                 android:gravity="right"
+                 android:orientation="horizontal"
+                 android:layout_width="match_parent"
+                 android:layout_height="wrap_content">
+
+                 <TextView
+                     android:visibility="gone"
+                     android:layout_marginRight="10dp"
+                     android:layout_width="wrap_content"
+                     android:layout_height="wrap_content"
+                     android:text="12"
+                     />
+
+
+                 <TextView
+                     android:id="@+id/presents"
+                     android:layout_marginRight="20dp"
+                     android:layout_width="wrap_content"
+                     android:layout_height="wrap_content"
+                     android:text="50%"
+                     />
+
+
+             </LinearLayout>
+
+
+        </LinearLayout>
+
+
+
+        <LinearLayout
+            android:gravity="center"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <LinearLayout
+                android:visibility="gone"
+                android:layout_marginLeft="10dp"
+                android:gravity="center"
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:background="@drawable/bg_circle5">
+            </LinearLayout>
+            <TextView
+                android:textColor="@color/greeen"
+                android:textStyle="bold"
+                android:layout_marginLeft="10dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Afternoon days"
+                />
+            <LinearLayout
+                android:gravity="right"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:visibility="gone"
+                    android:layout_marginRight="10dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="12"
+                    />
+
+
+                <TextView
+                    android:id="@+id/afternoons"
+                    android:layout_marginRight="20dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="50%"
+                    />
+
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+        <LinearLayout
+            android:gravity="center"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <LinearLayout
+                android:visibility="gone"
+                android:layout_marginLeft="10dp"
+                android:gravity="center"
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:background="@drawable/bg_circle5">
+            </LinearLayout>
+            <TextView
+                android:textColor="@color/colorAccent"
+                android:textStyle="bold"
+                android:layout_marginLeft="10dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Forenoon days"
+                />
+            <LinearLayout
+                android:gravity="right"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:visibility="gone"
+                    android:layout_marginRight="10dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="12"
+                    />
+
+
+                <TextView
+                    android:id="@+id/forenoons"
+                    android:layout_marginRight="20dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="50%"
+                    />
+
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+        <LinearLayout
+            android:gravity="center"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <LinearLayout
+                android:visibility="gone"
+                android:layout_marginLeft="10dp"
+                android:gravity="center"
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:background="@drawable/bg_circle">
+
+            </LinearLayout>
+
+            <TextView
+                android:textColor="@color/red"
+                android:textStyle="bold"
+                android:layout_marginLeft="10dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Absents"
+                />
+            <LinearLayout
+                android:gravity="right"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:visibility="gone"
+                    android:layout_marginRight="10dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="6"
+                    />
+
+
+                <TextView
+                    android:id="@+id/absents"
+                    android:layout_marginRight="20dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="24%"
+                    />
+
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+        <LinearLayout
+            android:gravity="center"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <LinearLayout
+                android:visibility="gone"
+                android:layout_marginLeft="10dp"
+                android:gravity="center"
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:background="@drawable/bg_circle2">
+
+            </LinearLayout>
+
+            <TextView
+               android:textColor="@color/yelow"
+                android:textStyle="bold"
+                android:layout_marginLeft="10dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Holiday"
+                />
+            <LinearLayout
+                android:gravity="right"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:visibility="gone"
+                    android:layout_marginRight="10dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="8"
+                    />
+
+
+                <TextView
+                    android:id="@+id/holidays"
+                    android:layout_marginRight="20dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="20%"
+                    />
+
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:gravity="center"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <LinearLayout
+                android:visibility="gone"
+                android:layout_marginLeft="10dp"
+                android:gravity="center"
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:background="@drawable/bg_circle3">
+
+            </LinearLayout>
+
+            <TextView
+                android:textColor="@color/black"
+                android:textStyle="bold"
+                android:layout_marginLeft="10dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Total working days"
+                />
+            <LinearLayout
+
+                android:gravity="right"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:visibility="gone"
+
+                    android:layout_marginRight="10dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="4"
+                    />
+
+
+                <TextView
+                    android:id="@+id/weekoffs"
+                    android:layout_marginRight="20dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="10%"
+                    />
+
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

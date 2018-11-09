@@ -1,0 +1,45 @@
+<resources>
+    <string name="app_name">School</string>
+    <string name="srn_drawer_open">Open</string>
+    <string name="srn_drawer_close">Close</string>
+
+    <string name="srn_ex_no_menu_view">No view for menu provided. You must either call .withMenuView(View) or pass a valid resource id to .withMenuLayout(int)</string>
+    <string name="srn_ex_bad_content_view">Your content view must contain exactly one child. Make sure you call inject() after setContentView().</string>
+
+    <string name="err_msg_email">Enter valid email address</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_navigation">Navigation</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+    <string name="barchart">Set Bar Chart Description</string>
+    <string name="error_card_expired">Carte expirée</string>
+    <string name="error_invalid_month">Mois invalide</string>
+
+    <string-array name="nav_item_activity_titles">
+        <item>Dashboard</item>
+        <item>Attendance</item>
+        <item>Notice Board</item>
+        <item>Time table</item>
+        <item>Settings</item>
+    </string-array>
+    <array name="material_calendar_months_array">
+        <item>January</item>
+        <item>February</item>
+        <item>March</item>
+        <item>April</item>
+        <item>May</item>
+        <item>June</item>
+        <item>July</item>
+        <item>August</item>
+        <item>September</item>
+        <item>October</item>
+        <item>November</item>
+        <item>December</item>
+    </array>
+</resources>

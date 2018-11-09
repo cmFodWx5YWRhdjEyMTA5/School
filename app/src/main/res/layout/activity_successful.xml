@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:weightSum="2"
+    android:orientation="vertical"
+    android:layout_height="match_parent"
+    tools:context=".adapters.Successful">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/payment_toolbar"
+        app:theme="@style/ThemeOverlay.AppCompat"
+        android:background="@color/greeen"
+        android:layout_width="match_parent"
+        android:layout_height="50dp">
+    </android.support.v7.widget.Toolbar>
+    <LinearLayout
+        android:layout_marginTop="50dp"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:orientation="horizontal"
+            android:weightSum="2"
+            android:background="@color/greeen"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+          <LinearLayout
+              android:orientation="vertical"
+              android:layout_weight="1"
+              android:layout_width="0dp"
+              android:layout_height="match_parent">
+              <TextView
+                  android:layout_marginLeft="10dp"
+                  android:layout_marginTop="10dp"
+                  android:textSize="20dp"
+                  android:textStyle="bold"
+                  android:textColor="@color/white"
+                  android:text="Payment"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content" />
+              <TextView
+                  android:layout_marginLeft="10dp"
+                  android:layout_marginTop="20dp"
+                  android:textSize="18dp"
+
+                  android:textColor="@color/white"
+                  android:text="VISA 0191"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content" />
+          </LinearLayout>
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent">
+                <TextView
+                    android:layout_marginRight="20dp"
+                    android:layout_marginTop="10dp"
+                    android:textSize="20dp"
+                    android:textStyle="bold"
+                    android:textColor="@color/white"
+                    android:text="Date : 06/05/2018"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+                <TextView
+                    android:layout_gravity="end"
+                   android:layout_marginRight="20dp"
+                    android:layout_marginTop="20dp"
+                    android:textSize="18dp"
+                    android:textStyle="bold"
+                    android:textColor="@color/white"
+                    android:text="PAId"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+
+                <android.support.v7.widget.CardView
+                    android:layout_marginBottom="10dp"
+                    app:cardCornerRadius="2dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_gravity="end|bottom"
+                    android:textColor="@color/white"
+                    android:layout_marginRight="20dp"
+                    android:layout_width="wrap_content"
+                    app:cardBackgroundColor="@color/day_disabled_background_color"
+                    android:layout_height="wrap_content">
+
+
+                    <TextView
+                        android:layout_margin="5dp"
+                        android:textStyle="bold"
+                        android:gravity="center"
+                       android:textSize="20dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="16000/-"
+
+                        />
+
+                </android.support.v7.widget.CardView>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:background="@color/white"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:weightSum="2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:padding="10dp"
+                        android:textStyle="bold"
+                        android:textSize="18dp"
+                        android:text="Payment Details"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginBottom="5dp"
+                        android:textStyle="bold"
+                        android:textColor="@color/black"
+                        android:textSize="18dp"
+                        android:text="Bus Fees"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:gravity="bottom"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <ImageView
+
+                android:layout_gravity="center"
+                android:src="@drawable/ic_visa_"
+                android:layout_width="40dp"
+                android:layout_height="wrap_content" />
+            <TextView
+
+                android:gravity="center"
+                android:layout_marginRight="20dp"
+                android:layout_marginTop="20dp"
+                android:textSize="18dp"
+                android:textStyle="bold"
+                android:textColor="@color/black"
+                android:text="PAId"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:layout_marginLeft="10dp"
+                android:gravity="center"
+                android:layout_marginRight="20dp"
+                android:layout_marginTop="20dp"
+                android:textSize="18dp"
+                android:textStyle="bold"
+                android:textColor="@color/black"
+                android:text="Time : 16/05/2018 03:30"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+</android.support.constraint.ConstraintLayout>
