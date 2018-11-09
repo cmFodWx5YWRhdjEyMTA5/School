@@ -394,13 +394,13 @@ public class Navigation extends AppCompatActivity {
                     {
 
                         JSONObject objects =  new JSONObject(bodyString);
-                       JSONArray list= objects.getJSONArray("DashBoard Upcoming Holiday Data");
+                       JSONArray list= objects.getJSONArray("DashBoard NoticeBoard Data");
                         for (int i=0;i<list.length(); i++)
                         {
                             JSONObject object = list.getJSONObject(i);
 
-                            titles = object.getString("holidayCategoryDesc");
-                            messages = object.getString("holidayCategoryName");
+                            titles = object.getString("noticeBoardTitle");
+                            messages = object.getString("noticeMessage");
                             noticeid    = object.getString("noticeBoardId");
                             Log.i("Tag","MyNavi"+ list);
                             if (!noticeid.equals(showpop))
