@@ -12,11 +12,14 @@
     <item
         android:menuCategory="container"
         android:title=""
+        android:orderInCategory="1"
         android:id="@+id/qrcode"
         android:icon="@drawable/ic_qr_code"
         app:showAsAction="ifRoom" />
 
     <item
+        android:orderInCategory="2"
+
         android:icon="@drawable/ic_shares"
         android:id="@+id/history2"
         android:title=""

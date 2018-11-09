@@ -88,6 +88,7 @@ public class Navigation extends AppCompatActivity {
     Retrofit retrofit;
     String titles,messages,showpop;
     String noticeid;
+    ImageView imageViews;
     MyInterface myInterface;
     int pos = 0;
     private static final int POS_DASHBOARD = 0;
@@ -220,6 +221,7 @@ public class Navigation extends AppCompatActivity {
 
                            Holidays holidays = new Holidays();
                            showFragment(holidays);
+                           viewpopup();
                        }
                        if (position == POS_ACCOUNT)
                        {
@@ -325,7 +327,6 @@ public class Navigation extends AppCompatActivity {
 
             this.doubleBackToExitPressedOnce = true;
             Toast.makeText(this, "Please click BACK again to exit", Toast.LENGTH_SHORT).show();
-
             new Handler().postDelayed(new Runnable() {
 
                 @Override
@@ -351,7 +352,6 @@ public class Navigation extends AppCompatActivity {
                 HomePage homePage= new HomePage();
                 showFragment(homePage);
                 break;
-
 
         }
 
@@ -429,29 +429,35 @@ public class Navigation extends AppCompatActivity {
     }
     void viewpopup()
     {
-        try {
-            //We need to get the instance of the LayoutInflater, use the context of this activity
 
+        try
+        {
             View popupView =  LayoutInflater.from(getApplicationContext()).inflate(R.layout.mypopup,
-                    (ViewGroup) findViewById(R.id.
+                   (ViewGroup) findViewById(R.id.
                             mycontainer));
-            ImageView imageView= (ImageView)popupView. findViewById(R.id.ends);
             popupWindow = new PopupWindow(popupView,
-                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT,false);
             topics =(TextView)popupView.findViewById(R.id.topics);
             descrip =(TextView)popupView.findViewById(R.id.descrip);
             topics.setText(titles);
             descrip.setText(messages);
+            imageViews= (ImageView)popupView.findViewById(R.id.enddd);
+            popupWindow.showAtLocation(popupView,Gravity.CENTER,0,0);
             imageView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     popupWindow.dismiss();
                 }
             });
-            popupWindow.showAtLocation(popupView,Gravity.CENTER,0,0);
-            dimBehind(popupWindow);
+            //dimBehind(popupWindow);
+
+
         }
+
+
+
         catch (Exception e)
+
         {
 
             e.printStackTrace();
@@ -463,7 +469,10 @@ public class Navigation extends AppCompatActivity {
         if (popupWindow.getBackground() == null) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 container = (View) popupWindow.getContentView().getParent();
-            } else {
+            }
+            else
+            {
+
                 container = popupWindow.getContentView();
             }
         } else {

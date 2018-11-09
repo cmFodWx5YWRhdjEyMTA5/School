@@ -7,7 +7,7 @@
     android:id="@+id/mydrawer"
     tools:context=".Navigation">
    <LinearLayout
-
+       android:id="@+id/mydrawers"
        android:orientation="vertical"
        android:layout_width="match_parent"
        android:layout_height="wrap_content">

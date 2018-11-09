@@ -100,6 +100,7 @@ public class HomePage extends Fragment implements View.OnClickListener {
     CardView cardView;
     BottomNavigationView bnav ,bnav1;
     TextView user_name;
+    ImageView imageViews;
    android.support.v7.widget.Toolbar toolbar;
     TextView textCartItemCount;
     int mCartItemCount = 10;
@@ -121,10 +122,11 @@ public class HomePage extends Fragment implements View.OnClickListener {
     MyInterface myInterface;
     TextView homework,home_ds,hols,hols_des,memo,mome_des,notice,notice_des;
     TextView view_hols,view_memo,view_notice,view_home;
-    TextView topics,descrip;
     SharedPreferences sharedPreferencess;
-    SharedPreferences.Editor editor;
+    SharedPreferences.Editor editors;
     ImageView findstudent;
+    TextView topics,descrip;
+    String showpop;
     @SuppressLint({"SetTextI18n", "NewApi", "CommitPrefEdits"})
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -134,7 +136,8 @@ public class HomePage extends Fragment implements View.OnClickListener {
        View view = inflater.inflate(R.layout.fragment_home_page, container, false);
         sharedPreferences = getActivity().getSharedPreferences(MainActivity.PREF_NAME,MODE_PRIVATE);
         sharedPreferencess = getActivity().getSharedPreferences("popup",MODE_PRIVATE);
-        editor = sharedPreferencess.edit();
+        editors = sharedPreferencess.edit();
+        showpop = sharedPreferencess.getString("mykey","");
         findstudent =(ImageView)view.findViewById(R.id.findstudent);
         user_name =(TextView)view.findViewById(R.id.user_name);
         performance=(FrameLayout)view.findViewById(R.id.performance);
@@ -172,10 +175,10 @@ public class HomePage extends Fragment implements View.OnClickListener {
         view_home.setOnClickListener(this);
         Log.i("Tag","UserNames"+ s_class + image);
         int navDefaultTextColor = Color.parseColor("#202020");
-        bnav =(BottomNavigationView)view.findViewById(R.id.bottomnav);
-        bnav1=(BottomNavigationView)view.findViewById(R.id.bottomnav1);
-        BottomNavigationViewHelper.disableShiftMode(bnav);
-        BottomNavigationViewHelper.disableShiftMode(bnav1);
+       // bnav =(BottomNavigationView)view.findViewById(R.id.bottomnav);
+        //bnav1=(BottomNavigationView)view.findViewById(R.id.bottomnav1);
+       // BottomNavigationViewHelper.disableShiftMode(bnav);
+       // BottomNavigationViewHelper.disableShiftMode(bnav1);
         timetable =(FrameLayout)view.findViewById(R.id.timetable);
         user_name.setText(userName  );
         getClassname.setText("class "+ s_class);
@@ -214,7 +217,9 @@ public class HomePage extends Fragment implements View.OnClickListener {
         findstudent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                viewpopup();
+
+              //  viewpopup();
+
             }
         });
 
@@ -453,8 +458,17 @@ public class HomePage extends Fragment implements View.OnClickListener {
                             {
                                 notice_des.setText(messages);
                             }
+                            String noticeid;
 
+                            noticeid    = object.getString("noticeBoardId");
+                            Log.i("Tag","MyNavi"+ list);
+                            if (!noticeid.equals(showpop))
+                            {
 
+                                editors.putString("mykey",  noticeid);
+                                editors.apply();
+                                viewpopup();
+                            }
 
                         }
 
@@ -519,7 +533,7 @@ public class HomePage extends Fragment implements View.OnClickListener {
 
 
 
-                        viewpopup();
+                       // viewpopup();
 
 
                     }
@@ -540,25 +554,30 @@ public class HomePage extends Fragment implements View.OnClickListener {
     }
     void viewpopup()
     {
-        try {
-            //We need to get the instance of the LayoutInflater, use the context of this activity
 
+        try
+        {
             View popupView =  LayoutInflater.from(getActivity()).inflate(R.layout.mypopup,
                     (ViewGroup)getView(). findViewById(R.id.
-                            mypops));
-          popupWindow = new PopupWindow(popupView,
-                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                            mycontainer));
+            popupWindow = new PopupWindow(popupView,
+                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT,false);
             topics =(TextView)popupView.findViewById(R.id.topics);
             descrip =(TextView)popupView.findViewById(R.id.descrip);
-          //  remark =(TextView)popupView.findViewById(R.id.remarks);
-         //   issue =(TextView)popupView.findViewById(R.id.issue);
-         //   memo_topic =(TextView)popupView.findViewById(R.id.memo_topic);
-            topics.setText( titles);
+            topics.setText(titles);
             descrip.setText(messages);
+            imageViews= (ImageView)popupView.findViewById(R.id.enddd);
             popupWindow.showAtLocation(popupView,Gravity.CENTER,0,0);
+            imageViews.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    popupWindow.dismiss();
+                }
+            });
             dimBehind(popupWindow);
         }
-        catch (Exception e) {
+        catch (Exception e)
+        {
             e.printStackTrace();
         }
     }
