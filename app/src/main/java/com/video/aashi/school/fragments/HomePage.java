@@ -256,18 +256,13 @@ public class HomePage extends Fragment implements View.OnClickListener {
             public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
 
                 if (Math.abs(verticalOffset)-appBarLayout.getTotalScrollRange() == 0)
-
                 {
 
-
                 }
-
                 else
-
                 {
 
-
-                }
+               }
 
             }
 
