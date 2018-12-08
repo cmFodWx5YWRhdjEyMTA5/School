@@ -30,11 +30,7 @@ public class SplashScreen extends AppCompatActivity {
         mProgress.setMax(100); // Maximum Progress
         mProgress.setProgressDrawable(drawable);
 
-      /*  ObjectAnimator animation = ObjectAnimator.ofInt(mProgress, "progress", 0, 100);
-        animation.setDuration(50000);
-        animation.setInterpolator(new DecelerateInterpolator());
-        animation.start();*/
-        tv = (TextView) findViewById(R.id.tv);
+       tv = (TextView) findViewById(R.id.tv);
         new Thread(new Runnable() {
 
             @Override
