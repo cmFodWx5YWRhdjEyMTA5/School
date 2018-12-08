@@ -327,7 +327,8 @@ public class Attendace extends Fragment implements OnDateSelectedListener {
     class  LoadAttendance extends AsyncTask<String, Integer, String>
     {
         @Override
-        protected void onPreExecute() {
+        protected void onPreExecute()
+        {
             progressDialog.setMessage("Please wait");
             progressDialog.setCancelable(false);
             progressDialog.show();
@@ -353,12 +354,20 @@ public class Attendace extends Fragment implements OnDateSelectedListener {
                         e.printStackTrace();
                     }
                     Log.i("Tag", "MyAttendance" + call.request().url() + bodyString);
-
                     try {
-
                         JSONObject object = new JSONObject(bodyString);
                         JSONArray list = object.getJSONArray("Student Attendance Details");
-                        for (int i = 0; i < list.length(); i++) {
+
+                        if (list.length() ==0 )
+                        {
+                            Toast.makeText(getActivity(),"No attendance found",Toast.LENGTH_LONG).show();
+                        }
+
+                        else
+                        {
+                        for (int i = 0; i < list.length(); i++)
+                        {
+                            Log.i("Tag", "MyAttendances" + list.length());
                             JSONObject data = list.getJSONObject(i);
                             String attendanceyear;
                             //  attendanceyear = data.getString("attendanceYear");
@@ -489,11 +498,11 @@ public class Attendace extends Fragment implements OnDateSelectedListener {
 
                                 }
                                 Log.e("Tag","NewDa" + presnts1 + absents1+holidays1 ) ;
-                                handler.postDelayed(new Runnable() {
-                                    public void run() {
-                                        progressDialog.dismiss();
-                                    }
-                                }, 10000);
+                              //  handler.postDelayed(new Runnable() {
+                              //      public void run() {
+                               //         progressDialog.dismiss();
+                            //        }
+                             //   }, 10000);
                             }
                             else
                             {
@@ -503,6 +512,7 @@ public class Attendace extends Fragment implements OnDateSelectedListener {
                               progressDialog.dismiss();
                             }
                             Log.e("Tag","NewDate"+monthName + month);
+                          }
                         }
                     }
                     catch (Exception e)
@@ -521,11 +531,15 @@ public class Attendace extends Fragment implements OnDateSelectedListener {
             });
             return null;
         }
+
+        @Override
+        protected void onPostExecute(String s) {
+            progressDialog.dismiss();
+            super.onPostExecute(s);
+        }
     }
-
-
     void DateDecoration(String dates,String date2)
-        {
+       {
 
             String mydate = dates.replace("-","/");
             @SuppressLint("SimpleDateFormat") SimpleDateFormat dateFormat= new SimpleDateFormat("dd/MM/yyyy");

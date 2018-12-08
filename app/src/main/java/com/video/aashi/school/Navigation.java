@@ -118,7 +118,6 @@ public class Navigation extends AppCompatActivity {
         protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_navigation);
-
         loadHomeFragment();
         sharedPreferences = getApplicationContext().getSharedPreferences(MainActivity.PREF_NAME,MODE_PRIVATE);
         sharedPreferencess =  getSharedPreferences("popup",MODE_PRIVATE);
@@ -141,13 +140,13 @@ public class Navigation extends AppCompatActivity {
         setSupportActionBar(toolbar);
         toolbar.setTitle("Dashboard");
         imageView =(ImageView)findViewById(R.id.userimage);
-         showpop = sharedPreferencess.getString("mykey","");
-      //   noticeid = showpop;
-
+        showpop = sharedPreferencess.getString("mykey","");
+        // noticeid = showpop;
         final GestureDetector mGestureDetector = new GestureDetector(
                 Navigation.this, new GestureDetector.SimpleOnGestureListener()
         {
-            @Override public boolean onSingleTapUp(MotionEvent e) {
+            @Override public boolean onSingleTapUp(MotionEvent e)
+            {
                 return true;
             }
 
@@ -310,7 +309,6 @@ public class Navigation extends AppCompatActivity {
         super.onPostCreate(savedInstanceState);
         drawerToggle.syncState();
     }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.dashboard,menu);
@@ -324,11 +322,9 @@ public class Navigation extends AppCompatActivity {
                 super.onBackPressed();
                 return;
             }
-
             this.doubleBackToExitPressedOnce = true;
             Toast.makeText(this, "Please click BACK again to exit", Toast.LENGTH_SHORT).show();
             new Handler().postDelayed(new Runnable() {
-
                 @Override
                 public void run() {
                     doubleBackToExitPressedOnce=false;
@@ -337,12 +333,9 @@ public class Navigation extends AppCompatActivity {
         }
         else
         {
-
-            HomePage homePage= new HomePage();
+           HomePage homePage= new HomePage();
             showFragment(homePage);
         }
-
-
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -352,12 +345,9 @@ public class Navigation extends AppCompatActivity {
                 HomePage homePage= new HomePage();
                 showFragment(homePage);
                 break;
-
         }
-
         return super.onOptionsItemSelected(item);
     }
-
     public void loadHomeFragment()
     {
         HomePage dashboard= new HomePage();
@@ -398,7 +388,6 @@ public class Navigation extends AppCompatActivity {
                         for (int i=0;i<list.length(); i++)
                         {
                             JSONObject object = list.getJSONObject(i);
-
                             titles = object.getString("noticeBoardTitle");
                             messages = object.getString("noticeMessage");
                             noticeid    = object.getString("noticeBoardId");
@@ -409,7 +398,6 @@ public class Navigation extends AppCompatActivity {
                                 editors.putString("mykey",  noticeid);
                                 editors.apply();
                             }
-
                         }
                     }
                     catch (JSONException e)

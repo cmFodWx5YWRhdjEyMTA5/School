@@ -63,7 +63,7 @@ public class Weekoffs extends Fragment {
     String general_id, year_id, loc_id;
     String day_name, date, day_des;
     String mytime;
-
+    TextView noholiday;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -71,7 +71,7 @@ public class Weekoffs extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_weekoffs, container, false);
         recyclerView = (RecyclerView) view.findViewById(R.id.weekoffs_recycle);
-
+        noholiday =(TextView)view.findViewById(R.id.noweekoff);
         general_id = Navigation.general_id;
         year_id = Navigation.academicyear;
         loc_id = Navigation.location_id;
@@ -132,12 +132,17 @@ public class Weekoffs extends Fragment {
                         try {
                             JSONObject object = new JSONObject(bodyString);
                             JSONArray list = object.getJSONArray("Student Holiday Details");
-                            for (int i = 0; i < list.length(); i++) {
-                                JSONObject data = list.getJSONObject(i);
-                                if (data.length() != 0) {
-                                    day_name = data.getString("dayName");
-                                    date = data.getString("holidayDateDisp");
-                                    day_des = data.getString("holidayCategoryDesc");
+                            if (list.length() !=0 ) {
+                                noholiday.setVisibility(View.GONE);
+                                recyclerView.setVisibility(View.VISIBLE);
+
+                                Log.i("Tag", "MyHolidayss" + list.length());
+                                for (int i = 0; i < list.length(); i++) {
+                                    JSONObject data = list.getJSONObject(i);
+                                    if (data.length() != 0) {
+                                        day_name = data.getString("dayName");
+                                        date = data.getString("holidayDateDisp");
+                                        day_des = data.getString("holidayCategoryDesc");
 
                                         holiday_list.add(new Holiday_adapter(date, day_name, day_des));
 
@@ -147,11 +152,17 @@ public class Weekoffs extends Fragment {
                                         progressDialog.dismiss();
 
 
-                                } else {
-                                    progressDialog.dismiss();
+                                    } else {
+                                        progressDialog.dismiss();
+                                    }
                                 }
                             }
-
+                            else
+                            {
+                                progressDialog.dismiss();
+                                recyclerView.setVisibility(View.GONE);
+                                noholiday.setVisibility(View.VISIBLE);
+                            }
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }

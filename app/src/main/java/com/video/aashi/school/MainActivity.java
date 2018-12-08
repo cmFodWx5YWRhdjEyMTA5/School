@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
     String username,user_image;
     SharedPreferences sharedPreferences;
     DrawerAdapter adapter;
-    public static final String PREF_NAME = "loginstatus";;
+    public static final String PREF_NAME = "loginstatus";
     private static final int POS_DASHBOARD = 0;
     private static final int POS_ACCOUNT = 1;
     private static final int POS_MESSAGES = 2;
@@ -54,8 +54,6 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
     private static final int POS_PERFO = 9;
     private static final int POS_PROFILE = 10;
     private static final int POS_LOGOUT = 11;
-
-
     public  static  String academicyear,student_id,location_id,general_id,class_id,examid;
     TextView studentname;
     RecyclerView list;
@@ -65,7 +63,6 @@ public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnI
     private Drawable[] screenIcons;
     private SlidingRootNav slidingRootNav;
     public static String CURRENT_TAG = String.valueOf(POS_DASHBOARD);
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

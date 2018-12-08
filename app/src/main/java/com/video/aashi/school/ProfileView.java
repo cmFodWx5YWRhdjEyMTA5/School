@@ -58,7 +58,7 @@ public class ProfileView extends Fragment {
 
 
    TextView tusername,tClass,tAcademic,tCity,tCitys,tState,tPincode,tMiddle,tLast,tMother,tFather,tFirst,tMobile,tGendre;
-   TextView   registation,joinedyears,joineddates ,ages,dobs,rollnumber;
+   TextView   registation,joinedyears,joineddates ,ages,dobs,rollnumber,bloodgroup;
     android.support.v7.widget.Toolbar toolbar;
     @SuppressLint("NewApi")
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -80,6 +80,7 @@ public class ProfileView extends Fragment {
         tMother =(TextView)view.findViewById(R.id.mothersname);
         tFather =(TextView)view.findViewById(R.id.fathersname);
         tMobile =(TextView)view.findViewById(R.id.mobiles);
+        bloodgroup =view.findViewById(R.id.bloodgroup);
         ages =(TextView)view.findViewById(R.id.age);
         dobs=(TextView)view.findViewById(R.id.dobs);
         rollnumber =(TextView)view.findViewById(R.id.rollno);
@@ -101,7 +102,7 @@ public class ProfileView extends Fragment {
                 .client(client)
                 .build();
         Picasso.get()
-                .load(APIUrl.IMAGE_URl+ HomePage. image)
+                .load(APIUrl.IMAGE_URl+ HomePage.image)
                 .error(R.drawable.badge )
                 .into(profileimg);
         loginInterface = retrofit.create(MyInterface.class);
@@ -147,6 +148,7 @@ public class ProfileView extends Fragment {
                     if(!bodyString.equals("{}"))
                     {
                         try {
+
                             JSONObject object = new JSONObject(bodyString);
                             JSONObject jsonObject = object.getJSONObject("Student Data");
                             s_name = jsonObject.getString("studentFirstName");
@@ -169,6 +171,7 @@ public class ProfileView extends Fragment {
                             joinedyear = jsonObject.getString("joiningAcademicYr");
                             dob = jsonObject.getString("studentDobDisp");
                             rollno = jsonObject.getString("rollNo");
+                            String bloodgroups = jsonObject.getString("studentBloodGroup");
                             Log.i("Tag", "MyProfiles"+ s_name+motherName+lastnmame+middlename+city);
                             tusername.setText(s_name);
                             tClass.setText("( " + s_class+" )");
@@ -190,6 +193,7 @@ public class ProfileView extends Fragment {
                             ages.setText(age+" Yrs");
                             dobs.setText(dob);
                             rollnumber.setText(rollno);
+                            bloodgroup.setText(bloodgroups);
                             progressDialog.dismiss();
                         }
                         catch (JSONException e)

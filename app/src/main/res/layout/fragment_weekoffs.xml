@@ -8,7 +8,15 @@
     android:background="@color/grey"
     tools:context=".fragments.payments.Weekoffs">
 
+    <TextView
+        android:gravity="center"
+        android:text="NO HOLIDAYS AVAILABLE"
+        android:id="@+id/noweekoff"
+        android:textSize="18dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
 
+        />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/weekoffs_recycle"

@@ -221,7 +221,6 @@ public class Login extends AppCompatActivity {
                           editor.putString("image",studentpic);
                           editor.putString("academic",acyearid);
                           editor.putBoolean("isLoginKey",true);
-
                           editor.putString("examid",examid);
                           editor.putString("classname",classname);
                           editor.putString("mobile",mobile);
