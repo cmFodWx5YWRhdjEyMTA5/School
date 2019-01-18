@@ -10,6 +10,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -18,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.video.aashi.school.APIUrl;
 import com.video.aashi.school.MainActivity;
@@ -65,6 +67,7 @@ public class Homework extends Fragment
    String viewmore = "0";
    HomeWorkAdapter homeWorkAdapter;
    TextView nohome;
+   String check ="0";
 
     @SuppressLint("NewApi")
     @Override
@@ -77,7 +80,10 @@ public class Homework extends Fragment
         locid =  Navigation.location_id;
         toolbar =(android.support.v7.widget.Toolbar) getActivity().findViewById(R.id.toolbar);
         toolbar.setTitle("Homework");
-
+        Bundle bundle = getArguments();
+        if (bundle != null) {
+            check =     bundle.getString("check");
+        }
         recyclerView =(RecyclerView)view.findViewById(R.id.recycle_home);
         nohome =(TextView)view.findViewById(R.id.nohome);
         setHasOptionsMenu(true);
@@ -107,7 +113,6 @@ public class Homework extends Fragment
     }
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-
         menu.clear();
         inflater.inflate(R.menu.dashboard,menu);
         super.onCreateOptionsMenu(menu, inflater);
@@ -117,13 +122,35 @@ public class Homework extends Fragment
 
         switch (item.getItemId())
         {
-
-
         }
-
         return super.onOptionsItemSelected(item);
     }
+    @Override
+    public void onResume() {
+        super.onResume();
+        getView().setFocusableInTouchMode(true);
+        getView().requestFocus();
+        getView().setOnKeyListener(new View.OnKeyListener()
+        {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (event.getAction() == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_BACK)
+                {
+                    if (check.equals("1"))
+                    {
+                        getFragmentManager().beginTransaction().replace(R.id.mycontainer,new HomePage()).commit();
+                    }
+                    else
+                    {
+                        getFragmentManager().beginTransaction().replace(R.id.mycontainer,new HomePage()).commit();
+                    }
 
+                    return true;
+                }
+                return false;
+            }
+        });
+    }
     class  getHomework extends AsyncTask
     {
 
@@ -147,52 +174,69 @@ public class Homework extends Fragment
                 @Override
                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                     homeworks = new ArrayList<>();
-                    String bodyString = null;
-                    try {
-                        bodyString = response.body().string();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                   // Log.i("Tag", "MyHomework" +classid+studentid+locid+viewmore+  call.request().url()+ bodyString);
-                    progressDialog.dismiss();
 
+
+
+                    String bodyString = null;
+
+                    if (response.isSuccessful())
                     {
                         try {
-                            JSONObject object = new JSONObject(bodyString);
-                            JSONArray list = object.getJSONArray("Home Work Details");
-                            if (list.length() != 0)
-                            {
-                                nohome.setVisibility(View.GONE);
-                                recyclerView.setVisibility(View.VISIBLE);
-                             for (int i = 0; i < list.length(); i++)
-                             {
-                                JSONObject data = list.getJSONObject(i);
-                                String description;
-                                String date1,date2;
-                                String chapter,subject;
-                                description = data.getString("homeWorkDesc");
-                                date1 = data.getString("giveDtDisp");
-                                date2 = data.getString("submitedDtDisp");
-                                chapter = data.getString("chapter");
-                                subject = data.getString("subject");
-                                homeworks.add(new Homeworks(date1,date2,description,chapter,subject));
-                                homeWorkAdapter = new HomeWorkAdapter(homeworks);
-                                recyclerView.setAdapter(homeWorkAdapter);
-
-
-                               }
-                            }
-                            else
-                            {
-                                nohome.setVisibility(View.VISIBLE);
-                                recyclerView.setVisibility(View.GONE);
-                            }
-                        }
-                        catch (JSONException e)
-                        {
+                            bodyString = response.body().string();
+                        } catch (IOException e) {
                             e.printStackTrace();
                         }
+                        // Log.i("Tag", "MyHomework" +classid+studentid+locid+viewmore+  call.request().url()+ bodyString);
+
+                        {
+                            try {
+                                JSONObject object = new JSONObject(bodyString);
+                                JSONArray list = object.getJSONArray("Home Work Details");
+                                if (list.length() != 0)
+                                {
+                                    nohome.setVisibility(View.GONE);
+                                    recyclerView.setVisibility(View.VISIBLE);
+                                    for (int i = 0; i < list.length(); i++)
+                                    {
+                                        JSONObject data = list.getJSONObject(i);
+                                        String description;
+                                        String date1,date2;
+                                        String chapter,subject;
+                                        description = data.getString("homeWorkDesc");
+                                        date1 = data.getString("giveDtDisp");
+                                        date2 = data.getString("submitedDtDisp");
+                                        chapter = data.getString("chapter");
+                                        subject = data.getString("subject");
+                                        homeworks.add(new Homeworks(date1,date2,description,chapter,subject));
+                                        homeWorkAdapter = new HomeWorkAdapter(homeworks);
+                                        recyclerView.setAdapter(homeWorkAdapter);
+
+//                                        homeWorkAdapter.notifyDataSetChanged();
+                                        progressDialog.dismiss();
+
+                                    }
+                                }
+                                else
+                                {
+                                    nohome.setVisibility(View.VISIBLE);
+                                    recyclerView.setVisibility(View.GONE);
+                                    progressDialog.dismiss();
+                                }
+                            }
+                            catch (JSONException e)
+                            {
+                                e.printStackTrace();
+                            }
+                        }
                     }
+                    else
+                    {
+
+                        Toast.makeText(getActivity(),"Something went wrong..!!",Toast.LENGTH_SHORT).show();
+                        progressDialog.dismiss();
+
+                    }
+
                 }
 
                 @Override
@@ -226,6 +270,7 @@ public class Homework extends Fragment
         @SuppressLint("SetTextI18n")
         @Override
         public void onBindViewHolder(@NonNull Viewholder viewholder, int i) {
+
 
             viewholder.subject.setText(holiday_adapters.get(i).getSubject());
             viewholder.chapter.setText("("+holiday_adapters.get(i).getChapter() +")");

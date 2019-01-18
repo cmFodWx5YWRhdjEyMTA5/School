@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.os.AsyncTask;
@@ -13,7 +14,9 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
@@ -54,6 +57,7 @@ import com.video.aashi.school.fragments.MainInvoice;
 import com.video.aashi.school.fragments.Memos;
 import com.video.aashi.school.fragments.NoticeBoard;
 import com.video.aashi.school.fragments.PtaMee;
+import com.video.aashi.school.fragments.Settings;
 import com.video.aashi.school.fragments.TimeTable;
 
 import org.json.JSONArray;
@@ -103,7 +107,8 @@ public class Navigation extends AppCompatActivity {
     private static final int POS_INVOICE = 9;
     private static final int POS_PERFO = 10;
     private static final int POS_PROFILE = 11;
-    private static final int POS_LOGOUT = 12;
+    private static  final int POS_SETTINGS =12;
+    private static final int POS_LOGOUT = 13;
     public  static  String academicyear,student_id,location_id,general_id,class_id,examid,emailids;
     ImageView imageView;
     TextView users,ids;
@@ -112,6 +117,11 @@ public class Navigation extends AppCompatActivity {
     int position;
     PopupWindow popupWindow;
     TextView topics,descrip;
+    public static String loginId,url,oName,parentName,studentName,parentPin,parentMob,userid;
+    SharedPreferences loginCredit;
+    private int currentMenuItem;
+    private Fragment fragmentCurrent;
+    boolean silent= true;
     @SuppressLint("CommitPrefEdits")
     @RequiresApi(api = Build.VERSION_CODES.O_MR1)
     @Override
@@ -120,6 +130,14 @@ public class Navigation extends AppCompatActivity {
         setContentView(R.layout.activity_navigation);
         loadHomeFragment();
         sharedPreferences = getApplicationContext().getSharedPreferences(MainActivity.PREF_NAME,MODE_PRIVATE);
+        loginCredit = getSharedPreferences("pinValidate",MODE_PRIVATE);
+        loginId = loginCredit.getString("loginId","");
+        url = loginCredit.getString(  "url","");
+        oName =  loginCredit.getString("oName","");
+        parentName = loginCredit.getString("parentName","");
+        studentName = loginCredit.getString("stuName","");
+        parentMob = loginCredit.getString("mobiles","");
+        userid = loginCredit.getString("userId","");
         sharedPreferencess =  getSharedPreferences("popup",MODE_PRIVATE);
         editors = sharedPreferencess.edit();
         username = sharedPreferences.getString("S_name","");
@@ -132,6 +150,7 @@ public class Navigation extends AppCompatActivity {
         examid = sharedPreferences.getString("examid","");
         emailids = sharedPreferences.getString("fathers","");
         s_class = sharedPreferences.getString("classname","");
+        Log.i("Tag","MyImages"+ academicyear+ student_id + url +parentMob);
         users =(TextView)findViewById(R.id.userna);
         ids=(TextView)findViewById(R.id.myids);
         users.setText(username);
@@ -140,9 +159,11 @@ public class Navigation extends AppCompatActivity {
         setSupportActionBar(toolbar);
         toolbar.setTitle("Dashboard");
         imageView =(ImageView)findViewById(R.id.userimage);
-        showpop = sharedPreferencess.getString("mykey","");
-        // noticeid = showpop;
-        final GestureDetector mGestureDetector = new GestureDetector(
+        showpop = sharedPreferencess.getString("myke","");
+        SharedPreferences settings = getSharedPreferences("com.example.xyz", 0);
+        silent   = settings.getBoolean("switchkey", false);
+        parentPin = settings.getString("myPin","");
+       final GestureDetector mGestureDetector = new GestureDetector(
                 Navigation.this, new GestureDetector.SimpleOnGestureListener()
         {
             @Override public boolean onSingleTapUp(MotionEvent e)
@@ -173,9 +194,9 @@ public class Navigation extends AppCompatActivity {
                 .error(R.drawable.badge )
                 .transform(new CircleTransform())
                 .into(imageView);
-              Log.i("Tag","MyImages"+ user_image);
+              Log.i("Tag","UserImages"+ APIUrl.IMAGE_URl+ user_image);
         new getHomepage().execute();
-
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         drawerLayout=(DrawerLayout)findViewById(R.id.mydrawer);
         recyclerView = (RecyclerView)findViewById(R.id.navi_recycle);
         layoutManager = new LinearLayoutManager(this);
@@ -186,45 +207,42 @@ public class Navigation extends AppCompatActivity {
            {
                stringArrayList.add(string);
            }
-        TypedArray imgs = getResources().obtainTypedArray(R.array.ld_activityScreenIcons);
-
-
+           TypedArray imgs = getResources().obtainTypedArray(R.array.ld_activityScreenIcons);
            navigationAdapter = new NavigationAdapter(stringArrayList,imgs,Navigation.this);
            recyclerView.setAdapter(navigationAdapter);
            drawerToggle =  new ActionBarDrawerToggle(this,drawerLayout,toolbar, R.string.navigation_drawer_open,R.string.navigation_drawer_close);
+
+
+
+
+
            drawerLayout.setDrawerListener(drawerToggle);
            recyclerView.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
                @Override
                public boolean onInterceptTouchEvent(@NonNull RecyclerView recyclerView, @NonNull MotionEvent motionEvent) {
                    View child = recyclerView.findChildViewUnder(motionEvent.getX(),motionEvent.getY());
-
-
-
                    if(child!=null && mGestureDetector.onTouchEvent(motionEvent)) {
                        drawerLayout.closeDrawers();
                       // Toast.makeText(getApplicationContext(), "The Item Clicked is: " +
                               // recyclerView.getChildPosition(child), Toast.LENGTH_SHORT).show();
                      position = recyclerView.getChildPosition(child);
                        if (position == POS_LOGOUT) {
-                        showDialogue(Navigation.this);
+                               showDialogue(Navigation.this);
+
                        }
                        if (position == POS_DASHBOARD)
                        {
                            HomePage dashboard = new HomePage();
                            showFragment(dashboard);
-
-
+                           fragmentCurrent = dashboard;
                        }
                        if(position == POS_HOLIDAYS)
                        {
-
                            Holidays holidays = new Holidays();
                            showFragment(holidays);
-                           viewpopup();
                        }
                        if (position == POS_ACCOUNT)
                        {
-
                            Attendace attendace= new Attendace();
                            showFragment(attendace);
                          //  viewpopup();
@@ -257,12 +275,20 @@ public class Navigation extends AppCompatActivity {
                        }
                        if(position == POS_EXAM)
                        {
-                           ExamTables examTables = new ExamTables();
+                           Bundle bundle= new Bundle();
+                           bundle.putString("combo","0");
+                           bundle.putString("check","1");
+                           ExamCombo examTables = new ExamCombo();
+                           examTables.setArguments(bundle);
                            showFragment(examTables);
                        }
                        if (position == POS_PERFO)
                        {
+                           Bundle bundle= new Bundle();
+                           bundle.putString("combo","1");
+                           bundle.putString("check","1");
                            ExamCombo performance = new ExamCombo();
+                           performance.setArguments(bundle);
                            showFragment(performance);
                        }
                        if(position == POS_INVOICE)
@@ -281,6 +307,11 @@ public class Navigation extends AppCompatActivity {
                            PtaMee ptaMee = new PtaMee();
                            showFragment(ptaMee);
                        }
+
+                       if (position == POS_SETTINGS)
+                       {
+                          showFragment(new Settings());
+                       }
                        return true;
                    }
                    return false;
@@ -296,12 +327,11 @@ public class Navigation extends AppCompatActivity {
 
                }
            });
-
-
     }
     private void showFragment(android.support.v4.app.Fragment fragment) {
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.mycontainer, fragment)
+                .addToBackStack(null)
                 .commit();
     }
     @Override
@@ -316,26 +346,9 @@ public class Navigation extends AppCompatActivity {
     }
     @Override
     public void onBackPressed() {
-        if (position == POS_DASHBOARD)
-        {
-            if (doubleBackToExitPressedOnce) {
-                super.onBackPressed();
-                return;
-            }
-            this.doubleBackToExitPressedOnce = true;
-            Toast.makeText(this, "Please click BACK again to exit", Toast.LENGTH_SHORT).show();
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    doubleBackToExitPressedOnce=false;
-                }
-            }, 2000);
-        }
-        else
-        {
-           HomePage homePage= new HomePage();
-            showFragment(homePage);
-        }
+
+        getSupportFragmentManager().beginTransaction().add(R.id.mycontainer,new HomePage()).commit();
+
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -350,6 +363,7 @@ public class Navigation extends AppCompatActivity {
     }
     public void loadHomeFragment()
     {
+
         HomePage dashboard= new HomePage();
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.setCustomAnimations(android.R.anim.fade_in,
@@ -357,14 +371,14 @@ public class Navigation extends AppCompatActivity {
         fragmentTransaction.replace(R.id.mycontainer, dashboard);
         fragmentTransaction.commitAllowingStateLoss();
         invalidateOptionsMenu();
+
     }
     class getHomepage extends AsyncTask
     {
         @Override
         protected Object doInBackground(Object[] objects) {
-
-            retrofit2.Call<ResponseBody> call = myInterface.getHome(new Home(class_id,student_id,location_id,general_id,"0",academicyear));
-
+            retrofit2.Call<ResponseBody> call = myInterface.getHome(new
+                    Home(class_id,student_id,location_id,general_id,"0",academicyear));
             call.enqueue(new Callback<ResponseBody>() {
                 @SuppressLint("SetTextI18n")
                 @Override
@@ -374,18 +388,17 @@ public class Navigation extends AppCompatActivity {
                     {
                         bodyString  = response.body().string();
                     }
+
                     catch (IOException e)
                     {
                         e.printStackTrace();
                     }
 
-
                     try
                     {
-
-                        JSONObject objects =  new JSONObject(bodyString);
+                       JSONObject objects =  new JSONObject(bodyString);
                        JSONArray list= objects.getJSONArray("DashBoard NoticeBoard Data");
-                        for (int i=0;i<list.length(); i++)
+                       for (int i=0;i<list.length(); i++)
                         {
                             JSONObject object = list.getJSONObject(i);
                             titles = object.getString("noticeBoardTitle");
@@ -394,9 +407,11 @@ public class Navigation extends AppCompatActivity {
                             Log.i("Tag","MyNavi"+ list);
                             if (!noticeid.equals(showpop))
                             {
-                                viewpopup();
-                                editors.putString("mykey",  noticeid);
+
+                               // viewpopup();
+                                editors.putString("myke",  noticeid);
                                 editors.apply();
+
                             }
                         }
                     }
@@ -410,14 +425,11 @@ public class Navigation extends AppCompatActivity {
 
                 }
             });
-
-
             return null;
         }
     }
     void viewpopup()
     {
-
         try
         {
             View popupView =  LayoutInflater.from(getApplicationContext()).inflate(R.layout.mypopup,
@@ -431,28 +443,21 @@ public class Navigation extends AppCompatActivity {
             descrip.setText(messages);
             imageViews= (ImageView)popupView.findViewById(R.id.enddd);
             popupWindow.showAtLocation(popupView,Gravity.CENTER,0,0);
+            dimBehind(popupWindow);
             imageView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     popupWindow.dismiss();
                 }
             });
-            //dimBehind(popupWindow);
-
-
-        }
-
-
-
+           }
         catch (Exception e)
-
         {
-
             e.printStackTrace();
-
         }
     }
-    public void dimBehind(PopupWindow popupWindow) {
+    public void dimBehind(PopupWindow popupWindow)
+    {
         View container;
         if (popupWindow.getBackground() == null) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -460,13 +465,17 @@ public class Navigation extends AppCompatActivity {
             }
             else
             {
-
                 container = popupWindow.getContentView();
             }
-        } else {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            }
+            else
+            {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+            {
                 container = (View) popupWindow.getContentView().getParent().getParent();
-            } else {
+            }
+            else
+            {
                 container = (View) popupWindow.getContentView().getParent();
             }
         }
@@ -476,7 +485,6 @@ public class Navigation extends AppCompatActivity {
         p.flags = WindowManager.LayoutParams.FLAG_DIM_BEHIND;
         p.dimAmount = 0.7f;
         wm.updateViewLayout(container, p);
-
     }
     private  void showDialogue(Context context)
     {
@@ -491,12 +499,8 @@ public class Navigation extends AppCompatActivity {
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        editor = sharedPreferences.edit();
-                        editor.remove("isLoginKey");
-                        editor.clear();
-                        editor.apply();
-                        Intent intent=new Intent(Navigation.this,Login.class);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        Intent intent = new Intent(Intent.ACTION_MAIN);
+                        intent.addCategory(Intent.CATEGORY_HOME);
                         startActivity(intent);
                     }
                 })
@@ -510,5 +514,31 @@ public class Navigation extends AppCompatActivity {
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .show();
          }
+    private  void showDialogues(Context context)
+    {
+        AlertDialog.Builder builder;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            builder = new AlertDialog.Builder(context, android.R.style.Theme_Material_Dialog_Alert);
+        } else {
+            builder = new AlertDialog.Builder(context);
+        }
+        builder = new AlertDialog.Builder(context);
+        builder.setTitle("Are you sure you want to exit?")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+
+                    }
+                })
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
+    }
 
 }

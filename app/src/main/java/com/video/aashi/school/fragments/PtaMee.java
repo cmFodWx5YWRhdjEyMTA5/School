@@ -20,6 +20,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.video.aashi.school.APIUrl;
 import com.video.aashi.school.MainActivity;
@@ -125,7 +126,7 @@ public class PtaMee extends Fragment
         recyclerView.setLayoutManager(layoutManager);
 
         new getMemos().execute();
-        toolbar.setTitle("Memoboard");
+        toolbar.setTitle("PTA meeting");
         return  view;
     }
 
@@ -142,67 +143,73 @@ public class PtaMee extends Fragment
             progressDialog.setCancelable(false);
             progressDialog.show();
         }
-
         @Override
         protected Object doInBackground(Object[] objects) {
             Call<ResponseBody> call = myInterface.getPta(new Memo(classId,studentId,locId,classGeneralId));
             call.enqueue(new Callback<ResponseBody>() {
                 @Override
                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                    String bodyString = null;
-                    try {
-                        bodyString  = response.body().string();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    Log.e("Tag", "MyPta"+ bodyString);
-                    try {
-                        JSONObject object = new JSONObject(bodyString);
-                        JSONArray list = object.getJSONArray("PTA Details");
-
-                        if (list.length() != 0)
-                        {
-                            nomemos.setVisibility(View.GONE);
-                            recyclerView.setVisibility(View.VISIBLE);
-                            for (int i = 0; i < list.length(); i++)
-                            {
-                                Log.i("Tag", "MyPtas" + call.request().url() + bodyString);
-                                JSONObject jsonObject = list.getJSONObject(i);
-                                date = jsonObject.getString("createdDtDisp");
-                                validdate = jsonObject.getString("validuntilDt");
-                                memoname = jsonObject.getString("memoTypeName");
-                                issues = jsonObject.getString("issues");
-                                inference = jsonObject.getString("inference");
-                                remarks = jsonObject.getString("remarks");
-                                Log.i("Tag","MyMems"+date+validdate+memoname+issues+inference+remarks);
-                                if (validdate.equals("null"))
-                                {
-                                    validdate = "-";
-                                }
-                                lists.add(new com.video.aashi.school.adapters.arrar_adapterd.Memos(date,validdate,inference,
-                                        remarks,issues,memoname));
-                                paidadapters = new Paidadapters(lists,getActivity());
-                                recyclerView.setAdapter(paidadapters);
-                                progressDialog.dismiss();
-                            }
-                        }
-                        else
-                        {
-                            nomemos.setVisibility(View.VISIBLE);
-                            recyclerView.setVisibility(View.GONE);
-                        }
-
-
-                        progressDialog.dismiss();
+                    String bodyString;
 
 
 
+                   if (!response.isSuccessful())
+                   {
+                       Toast.makeText(getActivity(),"Something went wrong..!!",Toast.LENGTH_SHORT).show();
+                       progressDialog.dismiss();
+                   }
+                  else {
+                       try {
+                           bodyString  = response.body().toString();
+                           JSONObject object = new JSONObject(bodyString);
+                           JSONArray list = object.getJSONArray("PTA Details");
+                           if (list.length() != 0)
+                           {
+                               nomemos.setVisibility(View.GONE);
+                               recyclerView.setVisibility(View.VISIBLE);
+                               for (int i = 0; i < list.length(); i++)
+                               {
+                                   Log.i("Tag", "MyPtas" + call.request().url() + bodyString);
+                                   JSONObject jsonObject = list.getJSONObject(i);
+                                   date = jsonObject.getString("createdDtDisp");
+                                   validdate = jsonObject.getString("validuntilDt");
+                                   memoname = jsonObject.getString("memoTypeName");
+                                   issues = jsonObject.getString("issues");
+                                   inference = jsonObject.getString("inference");
+                                   remarks = jsonObject.getString("remarks");
+                                   Log.i("Tag","MyMems"+date+validdate+memoname+issues+inference+remarks);
+                                   if (validdate.equals("null"))
+                                   {
+                                       validdate = "-";
+                                   }
+                                   lists.add(new com.video.aashi.school.adapters.arrar_adapterd.Memos(date,validdate,inference,
+                                           remarks,issues,memoname));
+                                   paidadapters = new Paidadapters(lists,getActivity());
+                                   recyclerView.setAdapter(paidadapters);
+                                   progressDialog.dismiss();
+                               }
+                           }
+                           else
+                           {
+                               nomemos.setVisibility(View.VISIBLE);
+                               recyclerView.setVisibility(View.GONE);
+                           }
 
 
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+                           progressDialog.dismiss();
 
-                    }
+
+
+
+
+                       } catch (JSONException e) {
+                           e.printStackTrace();
+
+                       }
+                   }
+
+
+
                 }
 
                 @Override

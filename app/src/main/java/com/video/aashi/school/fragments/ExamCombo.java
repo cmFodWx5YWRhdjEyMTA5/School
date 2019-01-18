@@ -12,6 +12,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -19,6 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.video.aashi.school.APIUrl;
 import com.video.aashi.school.MainActivity;
@@ -64,23 +66,25 @@ public class ExamCombo extends Fragment {
     Paidadapters paidadapter;
     List<ExamArray> examArrays= new ArrayList<>();
     Toolbar toolbar;
+    String combo ="1";
+    String check ="0";
 
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+
        View view = inflater.inflate(R.layout.fragment_exam_combo, container, false);
        setHasOptionsMenu(true);
-        toolbar =(android.support.v7.widget.Toolbar) getActivity().findViewById(R.id.toolbar);
-        setHasOptionsMenu(true);
-        toolbar.setTitle("Performance");
+       toolbar =(android.support.v7.widget.Toolbar) getActivity().findViewById(R.id.toolbar);
+       setHasOptionsMenu(true);
        getActivity().invalidateOptionsMenu();
+      //  combo ="1";
        examGroupName ="%";
        locId = Navigation.location_id;
-       startRow ="1";
-       noOfRecords ="1";
+       startRow ="0";
+       noOfRecords ="100";
        recyclerView =(RecyclerView)view.findViewById(R.id.examcombo);
         OkHttpClient defaulthttpClient = new OkHttpClient.Builder()
                 .addInterceptor(
@@ -91,7 +95,6 @@ public class ExamCombo extends Fragment {
                                 Request request = chain.request().newBuilder()
                                         .addHeader("Content-Type", "application/json").build();
                                 return chain.proceed(request);
-
                             }
                         }).build();
         retrofit =   new Retrofit.Builder().baseUrl(APIUrl.BASE_URL).addConverterFactory
@@ -103,107 +106,136 @@ public class ExamCombo extends Fragment {
         recyclerView.setLayoutManager(layoutManager);
         myInterface = retrofit.create(MyInterface.class);
         examArrays.clear();
+        Bundle bundle = getArguments();
+        if (bundle != null)
+        {
+            combo = bundle.getString("combo");
+            check = bundle.getString("check");
+        }
+     //   assert combo != null;
+        if (combo.equals("1"))
+        {
+            toolbar.setTitle("Performance");
+        }
+        else  if (combo.equals("0"))
+        {
+            toolbar.setTitle("Exam timetable");
+        }
         new getCombo().execute();
-
-
        return  view;
     }
-
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         menu.clear();
         inflater.inflate(R.menu.dashboard,menu);
 
         super.onCreateOptionsMenu(menu, inflater);
-
     }
-
-
+    @Override
+    public void onResume() {
+        super.onResume();
+        getView().setFocusableInTouchMode(true);
+        getView().requestFocus();
+        getView().setOnKeyListener(new View.OnKeyListener()
+        {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (event.getAction() == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_BACK)
+                {
+                    if (check.equals("1"))
+                    {
+                        getFragmentManager().beginTransaction().replace(R.id.mycontainer,new HomePage()).commit();
+                    }
+                    else
+                    {
+                        getFragmentManager().beginTransaction().replace(R.id.mycontainer,new HomePage()).commit();
+                    }
+                    return true;
+                }
+                return false;
+            }
+        });
+    }
     class  getCombo extends AsyncTask
     {
         ProgressDialog progressDialog;
         @Override
         protected void onPreExecute() {
-
             progressDialog = new ProgressDialog(getActivity());
             progressDialog.setMessage("Loading");
             progressDialog.setCancelable(true);
-
             super.onPreExecute();
         }
         @Override
-        protected Object doInBackground(Object[] objects) {
-
-
+        protected Object doInBackground(Object[] objects)
+        {
             Call<ResponseBody> call = myInterface.getCombo(new Combo(examGroupName,locId,startRow,noOfRecords));
             call.enqueue(new Callback<ResponseBody>() {
                 @Override
                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                     String bodyString = null;
-                    try
+                    Log.i("Tag","MyExamData"+examGroupName+locId+startRow+noOfRecords);
+                    if (response.isSuccessful())
                     {
-                        bodyString  = response.body().string();
-                    }
-                    catch (IOException e)
-                    {
-                        e.printStackTrace();
-                    }
-                  //  Log.i("Tag","MyExams"+ call.request().url() + bodyString );
-                    {
-                        try {
-                            String academicYearId;
-                            String examEndDtDisp;
-                            String examGroupName;
-                            String examGroupId;
-                            String examTermName;
-                            String locId,typeid;
-
-                            JSONObject object = new JSONObject(bodyString);
-                            JSONArray list = object.getJSONArray("Student Exam Combo");
-                            for (int i = 0; i < list.length(); i++)
-                            {
-                                Log.i("Tag","MyExams"+ call.request().url() + bodyString );
-                                JSONObject data = list.getJSONObject(i);
-
-                                academicYearId = data.getString("academicYearId");
-                                examGroupName = data.getString("examGroupName");
-                                examEndDtDisp = data.getString("examEndDtDisp");
-                                examGroupId = data.getString("examGroupId");
-                                examTermName = data.getString("examTermName");
-                                typeid = data.getString("examTypeId");
-
-                                locId = data.getString("locId");
-                                examArrays.add(new ExamArray(academicYearId,examEndDtDisp,examGroupName,
-                                        examGroupId,examTermName,locId,typeid ));
-                                paidadapter = new Paidadapters(examArrays,getActivity());
-                                recyclerView.setAdapter(paidadapter);
-
-                            }
-                        } catch (JSONException e) {
+                        try
+                        {
+                            bodyString  = response.body().string();
+                        }
+                        catch (IOException e)
+                        {
                             e.printStackTrace();
+                        }
+                        //  Log.i("Tag","MyExams"+ call.request().url() + bodyString );
+                        {
+                            try {
+                                String academicYearId;
+                                String examEndDtDisp;
+                                String examGroupName;
+                                String examGroupId;
+                                String examTermName;
+                                String locId,typeid;
+                                String maxMarks;
 
+                                JSONObject object = new JSONObject(bodyString);
+                                JSONArray list = object.getJSONArray("Student Exam Combo");
+                                for (int i = 0; i < list.length(); i++)
+                                {
+                                    Log.i("Tag","MyExams"+ call.request().url() + bodyString );
+                                    JSONObject data = list.getJSONObject(i);
+                                    academicYearId = data.getString("academicYearId");
+                                    examGroupName = data.getString("examGroupName");
+                                    examEndDtDisp = data.getString("examEndDtDisp");
+                                    examGroupId = data.getString("examGroupId");
+                                    examTermName = data.getString("examTermName");
+                                    typeid = data.getString("examTypeId");
+                                    locId = data.getString("locId");
+                                    maxMarks = data.getString("defaultMaxMark");
+                                    examArrays.add(new ExamArray(academicYearId,examEndDtDisp,examGroupName,
+                                            examGroupId,examTermName,locId,typeid ,maxMarks));
+                                    paidadapter = new Paidadapters(examArrays,getActivity());
+                                    recyclerView.setAdapter(paidadapter);
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
+                    else
+                    {
+                        Toast.makeText(getActivity(),"Something went wrong..!!",Toast.LENGTH_SHORT).show();
+                        progressDialog.dismiss();
+                    }
                 }
-
                 @Override
                 public void onFailure(Call<ResponseBody> call, Throwable t) {
-
                 }
             });
-
-
-
             return null;
         }
     }
     class Paidadapters extends RecyclerView.Adapter<Viewholder> {
-
-
         List<ExamArray> list;
         Context context;
-
-
         @NonNull
         @Override
         public Viewholder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
@@ -230,12 +262,32 @@ public class ExamCombo extends Fragment {
                   {
 
                       Performance performance = new Performance();
-                     Bundle bundle= new Bundle();
-                     bundle.putString("terms",list.get(i).getExamTermName());
-                     bundle.putString("groupid",list.get(i).getExamGroupId() );
-                     bundle.putString("examtype",list.get(i).getExamGroupName());
-                     performance.setArguments(bundle);
-                    getFragmentManager().beginTransaction().replace(R.id.mycontainer,performance).addToBackStack(null).commit();
+
+                      ExamTables examTables = new ExamTables();
+
+
+                     if (combo.equals("1"))
+                     {
+                         Bundle bundle= new Bundle();
+                         bundle.putString("terms",list.get(i).getExamTermName());
+                         bundle.putString("groupid",list.get(i).getExamGroupId() );
+                         bundle.putString("examtype",list.get(i).getExamGroupName());
+                         bundle.putString("maxmarks",list.get(i).getMaxMarks());
+                         performance.setArguments(bundle);
+                         getFragmentManager().beginTransaction().replace(R.id.mycontainer,performance).addToBackStack(null).commit();
+                     }
+                     else if (combo.equals("0"))
+                     {
+                         Bundle bundle= new Bundle();
+                         bundle.putString("terms",list.get(i).getExamTermName());
+                         bundle.putString("groupid",list.get(i).getExamGroupId() );
+                         bundle.putString("examtype",list.get(i).getExamGroupName());
+                         bundle.putString("maxmarks",list.get(i).getMaxMarks());
+                         examTables.setArguments(bundle);
+                         getFragmentManager().beginTransaction().replace(R.id.mycontainer,examTables).addToBackStack(null).commit();
+                     }
+
+
 
                   }
               });

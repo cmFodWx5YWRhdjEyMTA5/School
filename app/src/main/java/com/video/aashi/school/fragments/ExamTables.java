@@ -11,11 +11,13 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.video.aashi.school.APIUrl;
 import com.video.aashi.school.MainActivity;
@@ -65,6 +67,7 @@ public class ExamTables extends Fragment {
   MyInterface myInterface;
   RecyclerView recyclerView;
   ExamAdapter adapter;
+  String groupname,termname,groupid,maxmarks;
 
 
     @Override
@@ -76,11 +79,22 @@ public class ExamTables extends Fragment {
         setHasOptionsMenu(true);
         toolbar.setTitle("Exam timetable");
         recyclerView =(RecyclerView)view.findViewById(R.id.exam_recycle);
+        Bundle bundle = getArguments();
+
+        if (bundle != null)
+        {
+            groupname =bundle.getString("examtype");
+            termname = bundle.getString("terms");
+            groupid = bundle.getString("groupid");
+            maxmarks = bundle.getString("maxmarks");
+
+        }
         acaid = MainActivity.academicyear;
         examid ="1";
         locid = Navigation.location_id;
         studentd = Navigation.student_id;
         classid = Navigation.class_id;
+
         OkHttpClient defaulthttpClient = new OkHttpClient.Builder()
                 .addInterceptor(
                         new Interceptor() {
@@ -103,7 +117,29 @@ public class ExamTables extends Fragment {
         new getExams().execute();
         return  view;
     }
-
+    @Override
+    public void onResume() {
+        super.onResume();
+        getView().setFocusableInTouchMode(true);
+        getView().requestFocus();
+        getView().setOnKeyListener(new View.OnKeyListener()
+        {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (event.getAction() == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_BACK)
+                {
+                    Bundle bundle= new Bundle();
+                    bundle.putString("combo","0");
+                    bundle.putString("check","1");
+                    ExamCombo examTables = new ExamCombo();
+                    examTables.setArguments(bundle);
+                    getFragmentManager().beginTransaction().replace(R.id.mycontainer,examTables).commit();
+                    return true;
+                }
+                return false;
+            }
+        });
+    }
 
 class getExams extends AsyncTask
 {
@@ -122,48 +158,61 @@ class getExams extends AsyncTask
     protected Object doInBackground(Object[] objects) {
 
         examsList = new ArrayList<>();
-
-        Call<ResponseBody> call = myInterface.getExams(new ExamTime(examid,locid,classid,studentd,acaid));
+        Call<ResponseBody> call = myInterface.getExams(new ExamTime(groupid,locid,classid,studentd,acaid));
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-
                 String bodyString = null;
                 try {
-                    bodyString = response.body().string();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                 Log.i("Tag", "MyExams" + bodyString);
-                {
-                    try {
-                        JSONObject object = new JSONObject(bodyString);
-                        JSONArray list = object.getJSONArray("Student Exam TimeTable Details");
-                        for (int i = 0; i < list.length(); i++) {
-                            JSONObject data = list.getJSONObject(i);
+                    if  (!response.isSuccessful())
+                    {
+                        Toast.makeText(getActivity(),"Something went wrong",Toast.LENGTH_SHORT).show();
 
-                            if(data.length() != 0) {
+                        progressDialog.dismiss();
+                    }
+                    else {
+                        bodyString = response.body().string();
 
-                                String subject, date, time, amorpm;
-                                date = data.getString("examDtDisp");
-                                subject = data.getString("subjectGeneralName");
-                                time = data.getString("maxDuration");
-                                amorpm = data.getString("examSession");
-                                examsList.add(new Exams(time, amorpm, date, subject));
-                                adapter = new ExamAdapter(examsList);
 
-                                recyclerView.setAdapter(adapter);
-                                progressDialog.dismiss();
+
+                        try {
+                            JSONObject object = new JSONObject(bodyString);
+
+                            JSONArray list = object.getJSONArray("Student Exam TimeTable Details");
+                            for (int i = 0; i < list.length(); i++)
+                            {
+                                JSONObject data = list.getJSONObject(i);
+                                Log.i("Tag", "MyExams" + bodyString);
+                                if(data.length() != 0) {
+                                    String subject, date, time, amorpm;
+                                    date = data.getString("examDtDisp");
+                                    subject = data.getString("subjectGeneralName");
+                                    time = data.getString("maxDuration");
+                                    amorpm = data.getString("examSession");
+                                    examsList.add(new Exams(time, amorpm, date, subject));
+                                    adapter = new ExamAdapter(examsList);
+
+                                    recyclerView.setAdapter(adapter);
+                                    progressDialog.dismiss();
+
+                                }
                             }
                             if(progressDialog.isShowing())
                             {
                                 progressDialog.dismiss();
                             }
 
+                        } catch (JSONException e) {
+                            e.printStackTrace();
                         }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
                     }
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                {
+
                 }
             }
 

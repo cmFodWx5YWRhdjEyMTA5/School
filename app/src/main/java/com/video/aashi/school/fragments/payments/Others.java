@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.video.aashi.school.APIUrl;
 import com.video.aashi.school.MainActivity;
@@ -102,39 +103,51 @@ public class Others extends Fragment {
                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                     holiday_list = new ArrayList<>();
                     String bodyString = null;
-                    try {
-                        bodyString = response.body().string();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    Log.i("Tag", "MyHolidays" + year_id + general_id + loc_id + call.request().url() + bodyString);
+
+                    if (response.isSuccessful())
                     {
                         try {
-                            JSONObject object = new JSONObject(bodyString);
-                            JSONArray list = object.getJSONArray("Student Holiday Details");
-                            for (int i = 0; i < list.length(); i++) {
-                                JSONObject data = list.getJSONObject(i);
-                                if (data.length() != 0) {
-                                    day_name = data.getString("dayName");
-                                    date = data.getString("holidayDateDisp");
-                                    day_des = data.getString("holidayCategoryDesc");
-                                    if (!day_des.contains("WEEK OFF")) {
-                                        holiday_list.add(new Holiday_adapter(date, day_name, day_des));
-
-                                        holidayAdapter = new HolidayAdapter(holiday_list);
-
-                                        recyclerView.setAdapter(holidayAdapter);
-                                    } else {
-                                        holiday_list = new ArrayList<>();
-                                    }
-                                } else {
-                                }
-                            }
-
-                        } catch (JSONException e) {
+                            bodyString = response.body().string();
+                        } catch (IOException e) {
                             e.printStackTrace();
                         }
+                        Log.i("Tag", "MyHolidays" + year_id + general_id + loc_id + call.request().url() + bodyString);
+                        {
+                            try {
+                                JSONObject object = new JSONObject(bodyString);
+                                JSONArray list = object.getJSONArray("Student Holiday Details");
+                                for (int i = 0; i < list.length(); i++) {
+                                    JSONObject data = list.getJSONObject(i);
+                                    if (data.length() != 0) {
+                                        day_name = data.getString("dayName");
+                                        date = data.getString("holidayDateDisp");
+                                        day_des = data.getString("holidayCategoryDesc");
+                                        if (!day_des.contains("WEEK OFF")) {
+                                            holiday_list.add(new Holiday_adapter(date, day_name, day_des));
+
+                                            holidayAdapter = new HolidayAdapter(holiday_list);
+
+                                            recyclerView.setAdapter(holidayAdapter);
+                                        } else {
+                                            holiday_list = new ArrayList<>();
+                                        }
+                                    } else {
+                                    }
+                                }
+
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
                     }
+                    else
+                    {
+                        Toast.makeText(getActivity(),"Something went wrong..!!",Toast.LENGTH_SHORT).show();
+
+                    }
+
+
+
                 }
 
                 @Override
@@ -150,47 +163,34 @@ public class Others extends Fragment {
     }
 
     class HolidayAdapter extends RecyclerView.Adapter<Others.Viewholder> {
-
-
         List<Holiday_adapter> holiday_adapters;
-
-
         @NonNull
         @Override
         public Viewholder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-
             View view = LayoutInflater.from(getActivity()).inflate(R.layout.other_holidays, viewGroup, false);
             return new Viewholder(view);
         }
-
         public HolidayAdapter(List<Holiday_adapter> adapters) {
             this.holiday_adapters = adapters;
         }
-
         @Override
-        public void onBindViewHolder(@NonNull Viewholder viewholder, int i) {
-
+        public void onBindViewHolder(@NonNull Viewholder viewholder, int i)
+        {
             viewholder.day.setText(holiday_adapters.get(i).getTime());
-
             viewholder.time.setText(holiday_adapters.get(i).getDate());
             viewholder.description.setText(holiday_adapters.get(i).getDescription());
-
         }
-
         @Override
         public int getItemCount() {
             return holiday_adapters.size();
         }
     }
-
     public static class Viewholder extends RecyclerView.ViewHolder
-
     {
         TextView day;
         TextView time;
         TextView description;
         LinearLayout visibility;
-
         public Viewholder(@NonNull View itemView) {
             super(itemView);
             day = (TextView) itemView.findViewById(R.id.hlidayday);

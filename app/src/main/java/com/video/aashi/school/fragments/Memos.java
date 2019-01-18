@@ -13,33 +13,32 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.video.aashi.school.APIUrl;
 import com.video.aashi.school.MainActivity;
 import com.video.aashi.school.Navigation;
-import com.video.aashi.school.Performance;
 import com.video.aashi.school.R;
 import com.video.aashi.school.adapters.Interfaces.MyInterface;
-import com.video.aashi.school.adapters.arrar_adapterd.ExamArray;
+import com.video.aashi.school.adapters.arrar_adapterd.MyMemos;
 import com.video.aashi.school.adapters.post_class.Memo;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
+import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
 import okhttp3.ResponseBody;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
@@ -47,8 +46,6 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
-
-
 public class Memos extends Fragment {
 
 
@@ -67,16 +64,14 @@ public class Memos extends Fragment {
     String studentId;
     String locId;
     String classGeneralId;
-    String date;
-    String validdate;
-    String inference;
-    String remarks;
-   public static String issues;
-    public  static   String memoname;
-    Paidadapters paidadapters;
+    PopupWindow popupWindow;
+     String issues;
+      String memoname;
+    MemoAdapter paidadapters;
     RecyclerView recyclerView;
+    String check ="0";
     TextView validupto,infer,remark,issue,memo_topic,nomemos;
-    List<com.video.aashi.school.adapters.arrar_adapterd.Memos> lists= new ArrayList<>();
+    List<MyMemos> lists= new ArrayList<>();
   boolean click = false;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -95,18 +90,18 @@ public class Memos extends Fragment {
         classGeneralId = MainActivity.general_id;
         recyclerView =(RecyclerView)view.findViewById(R.id.mymemos);
          nomemos =(TextView)view.findViewById(R.id.nomemo);
-        lists.clear();
+        //lists.clear();
         getActivity().invalidateOptionsMenu();
         setHasOptionsMenu(true);
-        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
-        OkHttpClient client = new OkHttpClient.Builder().addInterceptor(logging).build();
+        Bundle bundle = getArguments();
+        popupWindow = new PopupWindow(getActivity());
 
-        retrofit =   new Retrofit.Builder().baseUrl(APIUrl.BASE_URL).addConverterFactory
-                (GsonConverterFactory.create())
-                .client(client)
-                .build();
-        layouts.setAlpha(1);
-        myInterface = retrofit.create(MyInterface.class);
+
+
+        if (bundle != null) {
+            check =     bundle.getString("check");
+        }
+
         memo =(Button)view.findViewById(R.id.viewmemo);
         memo.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -127,88 +122,143 @@ public class Memos extends Fragment {
                  //   popUp.update(50, 50, 300, 80);
              }
         });
+        OkHttpClient defaulthttpClient = new OkHttpClient.Builder()
+                .addInterceptor(
+                        new Interceptor() {
+                            @Override
+                            public okhttp3.Response intercept(Chain chain) throws IOException {
+                                Request request = chain.request().newBuilder()
+                                        .addHeader("Content-Type", "application/json").build();
+                                return chain.proceed(request);
 
+                            }
+                        }).build();
+        retrofit =   new Retrofit.Builder().baseUrl(APIUrl.BASE_URL).addConverterFactory
+                (GsonConverterFactory.create())
+                .client(defaulthttpClient)
+                .build();
+        layouts.setAlpha(1);
+        myInterface = retrofit.create(MyInterface.class);
         final LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(layoutManager);
-
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setItemViewCacheSize(20);
+        recyclerView.setDrawingCacheEnabled(true);
+        recyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
         new getMemos().execute();
         toolbar.setTitle("Memoboard");
         return  view;
     }
+    @Override
+    public void onResume() {
+        super.onResume();
+        getView().setFocusableInTouchMode(true);
+        getView().requestFocus();
+        getView().setOnKeyListener(new View.OnKeyListener()
+        {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (event.getAction() == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_BACK)
+                {
+                    if (popupWindow.isShowing())
+                    {
+                        popupWindow.dismiss();
+                    }
 
-
+                    if (check.equals("1"))
+                    {
+                        getFragmentManager().beginTransaction().replace(R.id.mycontainer,new HomePage()).commit();
+                    }
+                    else
+                    {
+                        getFragmentManager().beginTransaction().replace(R.id.mycontainer,new HomePage()).commit();
+                    }
+                    return true;
+                }
+                return false;
+            }
+        });
+    }
     class  getMemos extends AsyncTask
     {
         ProgressDialog progressDialog;
 
         @Override
         protected void onPreExecute() {
-            super.onPreExecute();
+
             progressDialog = new ProgressDialog(getActivity());
             progressDialog.setMessage("Loading");
             progressDialog.setCancelable(false);
             progressDialog.show();
+            super.onPreExecute();
         }
-
-        @Override
+             @Override
         protected Object doInBackground(Object[] objects) {
             Call<ResponseBody> call = myInterface.getMemos(new Memo(classId,studentId,locId,classGeneralId));
             call.enqueue(new Callback<ResponseBody>() {
                 @Override
                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                    lists = new ArrayList<>();
+
                     String bodyString = null;
-                    try {
-                        bodyString  = response.body().string();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    Log.e("Tag", "MyMemos"+ bodyString);
+
+                    if (response.isSuccessful())
+                    {
+                        try
+                        {
+                            bodyString  = response.body().string();
+                        }
+                        catch (IOException e)
+                        {
+                            e.printStackTrace();
+                        }
+                        Log.e("Tag", "MyMemos"+ bodyString);
                         try {
                             JSONObject object = new JSONObject(bodyString);
                             JSONArray list = object.getJSONArray("Memo Board Details");
-
                             if (list.length() != 0)
                             {
                                 nomemos.setVisibility(View.GONE);
                                 recyclerView.setVisibility(View.VISIBLE);
-                            for (int i = 0; i < list.length(); i++) {
-
-
-                                Log.i("Tag", "MyExams" + call.request().url() + bodyString);
-                                JSONObject jsonObject = list.getJSONObject(i);
-                                date = jsonObject.getString("createdDtDisp");
-                                validdate = jsonObject.getString("validuntilDt");
-                                memoname = jsonObject.getString("memoTypeName");
-                                issues = jsonObject.getString("issues");
-                                inference = jsonObject.getString("inference");
-                                remarks = jsonObject.getString("remarks");
-                                Log.i("Tag","MyMems"+date+validdate+memoname+issues+inference+remarks);
-                                lists.add(new com.video.aashi.school.adapters.arrar_adapterd.Memos(date,validdate,inference,
-                                        remarks,issues,memoname));
-                                paidadapters = new Paidadapters(lists,getActivity());
-                                recyclerView.setAdapter(paidadapters);
-                                progressDialog.dismiss();
+                                for (int i = 0; i < list.length(); i++)
+                                {
+                                    String date;
+                                    String validdate;
+                                    String inference;
+                                    String remarks;
+                                    JSONObject jsonObject = list.getJSONObject(i);
+                                    date = jsonObject.getString("createdDtDisp");
+                                    validdate = jsonObject.getString("validuntilDtDisp");
+                                    memoname = jsonObject.getString("memoTypeName");
+                                    issues = jsonObject.getString("issues");
+                                    inference = jsonObject.getString("inference");
+                                    remarks = jsonObject.getString("remarks");
+                                    lists.add(new MyMemos(date,validdate,inference,
+                                            remarks,issues,memoname));
+                                    paidadapters = new MemoAdapter(lists);
+                                    recyclerView.setAdapter(paidadapters);
+                                    paidadapters.notifyDataSetChanged();
+                                    progressDialog.dismiss();
                                 }
-
                             }
                             else
                             {
-                               nomemos.setVisibility(View.VISIBLE);
-                               recyclerView.setVisibility(View.GONE);
+                                nomemos.setVisibility(View.VISIBLE);
+                                recyclerView.setVisibility(View.GONE);
+                               progressDialog.dismiss();
                             }
-
-
-                                progressDialog.dismiss();
-
-
-
-
-
+                          // progressDialog.dismiss();
                         } catch (JSONException e) {
                             e.printStackTrace();
-
+                        }
                     }
+                    else
+                    {
+                        Toast.makeText(getActivity(),"something went wrong..!!",Toast.LENGTH_SHORT).show();
+                       progressDialog.dismiss();
+                    }
+
                 }
 
                 @Override
@@ -219,15 +269,17 @@ public class Memos extends Fragment {
 
 
 
+
+
             return null;
         }
     }
 
 
-    class Paidadapters extends RecyclerView.Adapter<Viewholder> {
+    class MemoAdapter extends RecyclerView.Adapter<Memos.  Viewholder> {
 
 
-        List<com.video.aashi.school.adapters.arrar_adapterd.Memos> list;
+        List<MyMemos> list;
         Context context;
 
 
@@ -238,9 +290,9 @@ public class Memos extends Fragment {
             return new Viewholder(view);
         }
 
-        public Paidadapters(List<com.video.aashi.school.adapters.arrar_adapterd.Memos> adapters, Context context)
+        public MemoAdapter(List<MyMemos> adapters)
         {
-            this.context = context;
+
             this.list = adapters;
         }
 
@@ -248,7 +300,7 @@ public class Memos extends Fragment {
         public void onBindViewHolder(@NonNull Viewholder viewholder, final int i)
         {
             viewholder.date.setText(list.get(i).getDate());
-            viewholder.issue.setText(list.get(i).getIssues());
+            viewholder.issue.setText(list.get(i).getRemarks());
             viewholder.main.setText(list.get(i).getMemoname());
 
             viewholder.main.setOnClickListener(new View.OnClickListener() {
@@ -298,7 +350,7 @@ public class Memos extends Fragment {
             View popupView =  LayoutInflater.from(getActivity()).inflate(R.layout.memoview,
               (ViewGroup)getView(). findViewById(R.id.
                     popupwindow));
-            final PopupWindow popupWindow = new PopupWindow(popupView,
+             popupWindow = new PopupWindow(popupView,
             LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
             validupto =(TextView)popupView.findViewById(R.id.valid);
             infer =(TextView)popupView.findViewById(R.id.inference);

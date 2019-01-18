@@ -20,6 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.video.aashi.school.APIUrl;
 import com.video.aashi.school.MainActivity;
@@ -129,24 +130,26 @@ public class Invoice extends Fragment {
                 @Override
                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                     String bodyString = null;
-                    try
+                    if (response.isSuccessful())
                     {
-                        bodyString  = response.body().string();
-                    }
-                    catch (IOException e)
-                    {
-                        e.printStackTrace();
-                    }
-                    Log.i("Tag","MyPaids"+ classid + call.request().url() + bodyString );
-                    {
-                        try {
-                            JSONObject object = new JSONObject(bodyString);
-                            JSONArray list = object.getJSONArray("Student Invoice Details");
-                            for(int i=0;i<list.length();i++)
-                            {
-                                if (list != null) {
-                                    JSONObject data = list.getJSONObject(i);
-                                    paid = data.getString("paid");
+                        try
+                        {
+                            bodyString  = response.body().string();
+                        }
+                        catch (IOException e)
+                        {
+                            e.printStackTrace();
+                        }
+                        Log.i("Tag","MyPaids"+ classid + call.request().url() + bodyString );
+                        {
+                            try {
+                                JSONObject object = new JSONObject(bodyString);
+                                JSONArray list = object.getJSONArray("Student Invoice Details");
+                                for(int i=0;i<list.length();i++)
+                                {
+                                    if (list != null) {
+                                        JSONObject data = list.getJSONObject(i);
+                                        paid = data.getString("paid");
                                         accountName = data.getString("accountName");
                                         bankName = data.getString("bankName");
                                         basicAmount = data.getString("basicAmount");
@@ -157,31 +160,39 @@ public class Invoice extends Fragment {
                                         paidAmount = data.getString("paidAmount");
                                         //itemName  = data.getString("itemName");
                                         invoice_arrays.add(new Invoice_array(accountName,bankName,basicAmount,chequePayment,invoiceDtDisp,invoiceHdrName,
-                                        invoiceStatusDisp,paidAmount,paid));
+                                                invoiceStatusDisp,paidAmount,paid));
                                         if (paid.contains("N"))
-                                         {
-                                           UnPaid.  invoice_arrays.add(new Invoice_array(accountName,bankName,basicAmount,chequePayment,invoiceDtDisp,invoiceHdrName,
-                                                     invoiceStatusDisp,paidAmount,paid));
-                                           UnPaid.paidadapter = new UnPaid.Paidadapterr(UnPaid. invoice_arrays,getActivity());
+                                        {
+                                            UnPaid.  invoice_arrays.add(new Invoice_array(accountName,bankName,basicAmount,chequePayment,invoiceDtDisp,invoiceHdrName,
+                                                    invoiceStatusDisp,paidAmount,paid));
+                                            UnPaid.paidadapter = new UnPaid.Paidadapterr(UnPaid. invoice_arrays,getActivity());
 
-                                           UnPaid.recyclerView .setAdapter(UnPaid.paidadapter);
+                                            UnPaid.recyclerView .setAdapter(UnPaid.paidadapter);
 
-                                          }
+                                        }
                                         paidadapter = new Paidadapter(invoice_arrays,paidadapter);
                                         recyclerView.setAdapter(paidadapter);
                                         progressDialog.dismiss();
 
-                                }
-                                else
-                                {
+                                    }
+                                    else
+                                    {
+                                    }
                                 }
                             }
-                        }
-                        catch (JSONException e)
-                        {
-                            e.printStackTrace();
+                            catch (JSONException e)
+                            {
+                                e.printStackTrace();
+                            }
                         }
                     }
+                    else
+                    {
+                        Toast.makeText(getActivity(),"Something went wrong..!!",Toast.LENGTH_SHORT).show();
+                        progressDialog.dismiss();
+                    }
+
+
                 }
                 @Override
                 public void onFailure(Call<ResponseBody> call, Throwable t)

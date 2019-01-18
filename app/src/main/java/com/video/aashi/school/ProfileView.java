@@ -23,6 +23,7 @@ import android.widget.Toolbar;
 import com.squareup.picasso.Picasso;
 import com.video.aashi.school.adapters.Interfaces.CircleTransform;
 import com.video.aashi.school.adapters.Interfaces.MyInterface;
+import com.video.aashi.school.adapters.post_class.Login;
 import com.video.aashi.school.fragments.HomePage;
 
 import org.json.JSONException;
@@ -65,7 +66,7 @@ public class ProfileView extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.activity_profile_view, container, false);
-        toolbar=(android.support.v7.widget.Toolbar)view. findViewById(R.id.profile_tool);
+        toolbar=(android.support.v7.widget.Toolbar)getActivity(). findViewById(R.id.toolbar);
         tFirst =(TextView)view. findViewById(R.id.firstname);
         tusername =(TextView)view.findViewById(R.id.usernames);
         tClass =(TextView)view.findViewById(R.id.classid);
@@ -90,10 +91,9 @@ public class ProfileView extends Fragment {
         profileimg =(ImageView)view.findViewById(R.id.profileImg);
     //    Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         sharedPreferences =getActivity(). getSharedPreferences("mylogin",MODE_PRIVATE);
-        username = sharedPreferences.getString("user","");
-        password = sharedPreferences.getString("pass","");
+        username = Navigation.loginId;
+        password = Navigation.parentPin;
         toolbar.setTitle("Profile");
-
         logging.setLevel(HttpLoggingInterceptor.Level.BODY);
         OkHttpClient client = new OkHttpClient.Builder().addInterceptor(logging).build();
 
@@ -110,7 +110,6 @@ public class ProfileView extends Fragment {
         new LoadProfile().execute();
         return view ;
     }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
@@ -133,7 +132,7 @@ public class ProfileView extends Fragment {
         @Override
         protected Object doInBackground(Object[] objects) {
 
-            retrofit2.Call<ResponseBody> call = loginInterface.LoginValidation(username,password);
+            retrofit2.Call<ResponseBody> call = loginInterface.getLogin(new Login(Navigation.loginId,Navigation.parentPin));
             call.enqueue(new Callback<ResponseBody>() {
                 @SuppressLint("SetTextI18n")
                 @Override
@@ -207,6 +206,8 @@ public class ProfileView extends Fragment {
                     else
                     {
                         Toast.makeText(getActivity(),"Something went wrong!!!",Toast.LENGTH_LONG).show();
+
+                        progressDialog.dismiss();
                     }
 
 

@@ -10,6 +10,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -17,6 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.video.aashi.school.APIUrl;
 import com.video.aashi.school.MainActivity;
@@ -43,35 +45,39 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import static android.content.Context.MODE_PRIVATE;
 public class NoticeBoard extends Fragment
-
 {
     String title,createdat,time,activedis,noticemessage;
     RecyclerView noticeboard;
     MyInterface loginInterface;
-     Retrofit retrofit;
-     List<NoticeBoards> noticeBoards= new ArrayList<>();
+    Retrofit retrofit;
+    List<NoticeBoards> noticeBoards= new ArrayList<>();
     HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
-SharedPreferences sharedPreferences;
-String  studentid,genid,classid,locaid;
-Notification_designs notification_designs;
-Toolbar toolbar;
-TextView nonotifi;
+    SharedPreferences sharedPreferences;
+    String  studentid,genid,classid,locaid;
+    Notification_designs notification_designs;
+    Toolbar toolbar;
+    TextView nonotifi;
+    String check ="0";
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
        View view = inflater.inflate(R.layout.fragment_notice_board, container, false);
-
-        sharedPreferences = getActivity().getSharedPreferences(MainActivity.PREF_NAME,MODE_PRIVATE);
+       sharedPreferences = getActivity().getSharedPreferences(MainActivity.PREF_NAME,MODE_PRIVATE);
        noticeboard = view.findViewById(R.id.notification_recylerview);
        studentid = sharedPreferences.getString("StudentId","");
        genid = sharedPreferences.getString("gen_id","");
        classid = sharedPreferences.getString("class_id","");
        locaid = sharedPreferences.getString("location_id","");
        nonotifi =(TextView)view.findViewById(R.id.nonotify);
-        toolbar =(android.support.v7.widget.Toolbar) getActivity().findViewById(R.id.toolbar);
+       toolbar =(android.support.v7.widget.Toolbar) getActivity().findViewById(R.id.toolbar);
         setHasOptionsMenu(true);
         toolbar.setTitle("Noticeboard");
+        Bundle bundle = getArguments();
+        if (bundle != null) {
+            check =     bundle.getString("check");
+        }
         OkHttpClient defaulthttpClient = new OkHttpClient.Builder()
                 .addInterceptor(
                         new Interceptor() {
@@ -95,6 +101,31 @@ TextView nonotifi;
        new GetNotification().execute();
        return view;
     }
+    @Override
+    public void onResume() {
+        super.onResume();
+        getView().setFocusableInTouchMode(true);
+        getView().requestFocus();
+        getView().setOnKeyListener(new View.OnKeyListener()
+        {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (event.getAction() == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_BACK)
+                {
+                    if (check.equals("1"))
+                    {
+                        getFragmentManager().beginTransaction().replace(R.id.mycontainer,new HomePage()).commit();
+                    }
+                    else
+                    {
+                        getFragmentManager().beginTransaction().replace(R.id.mycontainer,new HomePage()).commit();
+                    }
+                    return true;
+                }
+                return false;
+            }
+        });
+    }
     class GetNotification extends AsyncTask
     {
     ProgressDialog progressDialog;
@@ -108,10 +139,7 @@ TextView nonotifi;
         }
         @Override
         protected void onPostExecute(Object o) {
-            if(progressDialog.isShowing())
-            {
-                progressDialog.dismiss();
-            }
+
             super.onPostExecute(o);
         }
         @Override
@@ -124,6 +152,15 @@ TextView nonotifi;
                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response)
                 {
                     noticeBoards = new ArrayList<>();
+
+                    if (!response.isSuccessful())
+                    {
+                        Toast.makeText(getActivity(),"Something went wrong..!!!",Toast.LENGTH_SHORT).show();
+                    }
+                    else
+                    {
+
+
                     String bodyString = null;
                     try {
                         bodyString  = response.body().string();
@@ -154,6 +191,7 @@ TextView nonotifi;
                                 noticeBoards.add(new NoticeBoards(activedis,title,createdat,time,noticemessage));
                                 notification_designs = new Notification_designs(getActivity(),noticeBoards);
                                 noticeboard.setAdapter(notification_designs);
+                                progressDialog.dismiss();
                                 Log.i("Tag","MyDebug"+  time);
                             }
                             }
@@ -162,16 +200,12 @@ TextView nonotifi;
                                 nonotifi.setVisibility(View.VISIBLE);
                                 noticeboard.setVisibility(View.GONE);
                             }
-
-                            if(progressDialog.isShowing())
-                            {
-                                progressDialog.dismiss();
-                            }
-
                         }
-                        catch (JSONException e) {
+                        catch (JSONException e)
+                        {
                             e.printStackTrace();
                         }
+                    }
                     }
                 }
                 @Override

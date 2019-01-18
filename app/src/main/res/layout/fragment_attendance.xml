@@ -22,6 +22,7 @@
             android:layout_height="wrap_content"
             app:mcv_showOtherDates="none"
             app:mcv_selectionColor="#00F"
+            app:mcv_dateTextAppearance="@style/CalenderViewDateCustomText"
             />
     </LinearLayout>
 
@@ -108,7 +109,7 @@
                      android:layout_marginRight="20dp"
                      android:layout_width="wrap_content"
                      android:layout_height="wrap_content"
-                     android:text="50%"
+                     android:text="0"
                      />
 
 
@@ -161,7 +162,7 @@
                     android:layout_marginRight="20dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="50%"
+                    android:text="0"
                     />
 
 
@@ -211,7 +212,7 @@
                     android:layout_marginRight="20dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="50%"
+                    android:text="0"
                     />
 
 
@@ -263,7 +264,7 @@
                     android:layout_marginRight="20dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="24%"
+                    android:text="0"
                     />
 
 
@@ -315,7 +316,7 @@
                     android:layout_marginRight="20dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="20%"
+                    android:text="0"
                     />
 
 
@@ -370,7 +371,7 @@
                     android:layout_marginRight="20dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="10%"
+                    android:text="0"
                     />
 
 

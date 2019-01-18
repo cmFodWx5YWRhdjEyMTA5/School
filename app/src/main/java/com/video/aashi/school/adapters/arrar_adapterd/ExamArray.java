@@ -8,9 +8,10 @@ public class ExamArray {
     String examTermName;
     String locId;
     String typeid;
+    String maxMarks;
 
     public ExamArray(String academicYear,String examEndDtDisp,String examGroupName,String examGroupId,
-                     String examTermName,String locId,String typeid)
+                     String examTermName,String locId,String typeid,String maxMarks)
     {
         this.academicYearId = academicYear;
         this.examEndDtDisp = examEndDtDisp;
@@ -19,6 +20,7 @@ public class ExamArray {
         this.examTermName = examTermName;
         this.locId = locId;
         this.typeid = typeid;
+        this.maxMarks = maxMarks;
 
     }
 
@@ -48,6 +50,10 @@ public class ExamArray {
 
     public String getTypeid() {
         return typeid;
+    }
+
+    public String getMaxMarks() {
+        return maxMarks;
     }
 }
 

@@ -4,16 +4,19 @@ package com.video.aashi.school.fragments;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.ActivityOptions;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.BottomNavigationView;
@@ -28,6 +31,7 @@ import android.telecom.Call;
 import android.util.Log;
 import android.util.Pair;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -56,8 +60,12 @@ import com.video.aashi.school.Performance;
 import com.video.aashi.school.ProfileView;
 import com.video.aashi.school.R;
 import com.video.aashi.school.adapters.Interfaces.CircleTransform;
+import com.video.aashi.school.adapters.Interfaces.DatabaseHelper;
 import com.video.aashi.school.adapters.Interfaces.MyInterface;
+import com.video.aashi.school.adapters.arrar_adapterd.Name;
 import com.video.aashi.school.adapters.drawer.BottomNavigationViewHelper;
+import com.video.aashi.school.adapters.local.DateLocal;
+import com.video.aashi.school.adapters.post_class.Attend;
 import com.video.aashi.school.adapters.post_class.Home;
 
 import org.json.JSONArray;
@@ -70,6 +78,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -127,6 +137,10 @@ public class HomePage extends Fragment implements View.OnClickListener {
     ImageView findstudent;
     TextView topics,descrip;
     String showpop;
+    String aca_year;
+    String monthName;
+    DateLocal db;
+    static boolean doubleBackToExitPressedOnce = false;
     @SuppressLint({"SetTextI18n", "NewApi", "CommitPrefEdits"})
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -144,6 +158,7 @@ public class HomePage extends Fragment implements View.OnClickListener {
         getClassname =(TextView)view.findViewById(R.id.s_class);
         mobileno =(TextView)view.findViewById(R.id.mobileno);
         profile =(ImageView) view.findViewById(R.id.profile_image);
+        db = new DateLocal(getActivity());
         userName =  sharedPreferences.getString("S_name","");
         s_class = sharedPreferences.getString("classname","");
         mobile = sharedPreferences.getString("mobile","");
@@ -162,6 +177,7 @@ public class HomePage extends Fragment implements View.OnClickListener {
         studentId = Navigation.student_id;
         locId = Navigation.location_id;
         classGeneralId = Navigation.general_id;
+        aca_year = Navigation.academicyear;
         viewMore = "0";
         mypops =(NestedScrollView)view.findViewById(R.id.mypops);
         academicYearId = Navigation.academicyear;
@@ -199,7 +215,6 @@ public class HomePage extends Fragment implements View.OnClickListener {
                                 Request request = chain.request().newBuilder()
                                         .addHeader("Content-Type", "application/json").build();
                                 return chain.proceed(request);
-
                             }
                         }).build();
         retrofit =   new Retrofit.Builder().baseUrl(APIUrl.BASE_URL).addConverterFactory
@@ -210,7 +225,12 @@ public class HomePage extends Fragment implements View.OnClickListener {
         timetable.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getFragmentManager().beginTransaction().replace(R.id.mycontainer,new TimeTable()).
+                Bundle bundle= new Bundle();
+                bundle.putString("combo","1");
+                bundle.putString("check","1");
+                TimeTable performance = new TimeTable();
+                performance.setArguments(bundle);
+                getFragmentManager().beginTransaction().replace(R.id.mycontainer,performance).
                         addToBackStack(null).commit();
             }
         });
@@ -226,31 +246,47 @@ public class HomePage extends Fragment implements View.OnClickListener {
         performance.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                ExamCombo performances = new ExamCombo();
+                Bundle bundle= new Bundle();
+                bundle.putString("combo","1");
+                bundle.putString("check","1");
 
-               getFragmentManager().beginTransaction().replace(R.id.mycontainer,new ExamCombo()).
-                       addToBackStack(null).commit();
+                performances.setArguments(bundle);
+                getFragmentManager().beginTransaction().replace(R.id.mycontainer,performances).
+                        addToBackStack(null).commit();
             }
         });
         time.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getFragmentManager().beginTransaction().replace(R.id.mycontainer,new TimeTable()).
+                Bundle bundle= new Bundle();
+                bundle.putString("combo","1");
+                bundle.putString("check","1");
+                TimeTable performance = new TimeTable();
+                performance.setArguments(bundle);
+                getFragmentManager().beginTransaction().replace(R.id.mycontainer,performance).
                         addToBackStack(null).commit();
             }
         });
         perfor.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getFragmentManager().beginTransaction().replace(R.id.mycontainer,new ExamCombo()).
+                Bundle bundle= new Bundle();
+                bundle.putString("combo","1");
+                bundle.putString("check","1");
+                ExamCombo performance = new ExamCombo();
+                performance.setArguments(bundle);
+                getFragmentManager().beginTransaction().replace(R.id.mycontainer,performance).
                         addToBackStack(null).commit();
+
             }
         });
-      Picasso.get()
+       Picasso.get()
                 .load(APIUrl.IMAGE_URl+ image)
                 .error(R.drawable.badge )
                 .transform(new CircleTransform())
                 .into(profile);
-
+      // loadDatas();
         appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
             @Override
             public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
@@ -273,19 +309,24 @@ public class HomePage extends Fragment implements View.OnClickListener {
       {
       @Override
       public void onClick(View v) {
-          Intent intent = new Intent(getActivity() , ProfileView.class);
-          Pair[] pairs= new Pair[3];
-          pairs[0] = new Pair<View , String> (profile ,"profile");
-          pairs[1] = new Pair<View , String> (usenmae ,"name");
-          pairs[2] = new Pair<View , String> (classname ,"classname");
-          ActivityOptions activityOptions =  ActivityOptions.makeSceneTransitionAnimation(getActivity());
-          startActivity(intent,activityOptions.toBundle());
+
+
 
       }
   });
 
     return  view;
     }
+
+    void  showFragments(Fragment fragment)
+    {
+        Bundle bundle= new Bundle();
+        bundle  .putString("chech","1");
+        fragment.setArguments(bundle);
+        getFragmentManager().beginTransaction().replace(R.id.mycontainer,fragment).
+                addToBackStack(null).commit();
+    }
+
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
     {
@@ -333,8 +374,6 @@ public class HomePage extends Fragment implements View.OnClickListener {
 
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
-
-
         super.onPrepareOptionsMenu(menu);
     }
 
@@ -369,23 +408,42 @@ public class HomePage extends Fragment implements View.OnClickListener {
     }
 
     private void showFragment(android.support.v4.app.Fragment fragment) {
+        Bundle bundle= new Bundle();
+        bundle  .putString("check","1");
+        fragment.setArguments(bundle);
         getFragmentManager().beginTransaction()
                 .replace(R.id.mycontainer, fragment)
                 .addToBackStack(null)
                 .commit();
+
     }
+
     class getHomepage extends AsyncTask
     {
+
+        @Override
+        protected void onPreExecute() {
+
+      //      ProgressDialog progressDialog=  new ProgressDialog();
+
+            super.onPreExecute();
+        }
+
         @Override
         protected Object doInBackground(Object[] objects) {
 
-            retrofit2.Call<ResponseBody> call = myInterface.getHome(new Home(classId,studentId,locId,classGeneralId,viewMore,academicYearId));
+            retrofit2.Call<ResponseBody> call = myInterface.getHome(new Home
+                    (classId,studentId,locId,classGeneralId,viewMore,academicYearId));
+
+            //Log.i("Tag","MyHomePage"+)
 
             call.enqueue(new Callback<ResponseBody>() {
                 @SuppressLint("SetTextI18n")
                 @Override
                 public void onResponse(retrofit2.Call<ResponseBody> call, Response<ResponseBody> response) {
                     String bodyString = null;
+                    Log.i("Tag","MyHomePage"+call.request().url()+classId+studentId+locId+
+                            classGeneralId+viewMore+academicYearId);
                     try
                     {
                         bodyString  = response.body().string();
@@ -454,28 +512,22 @@ public class HomePage extends Fragment implements View.OnClickListener {
                                 notice_des.setText(messages);
                             }
                             String noticeid;
-
                             noticeid    = object.getString("noticeBoardId");
                             Log.i("Tag","MyNavi"+ list);
                             if (!noticeid.equals(showpop))
                             {
-
                                 editors.putString("mykey",  noticeid);
                                 editors.apply();
                                 viewpopup();
                             }
-
                         }
-
                         JSONArray lists= objects.getJSONArray("DashBoard MemoBoard Data");
                         for (int i=0;i<lists.length(); i++)
                         {
                             JSONObject object = lists.getJSONObject(i);
-
                             String title = object.getString("memoTypeName");
                             String message = object.getString("remarks");
-
-
+                            Log.i("TAG","MyHolidays"+ title+message );
                             if (title.length() >35)
                             {
                                 memo.setText(title.subSequence(0,35)+"...");
@@ -485,7 +537,6 @@ public class HomePage extends Fragment implements View.OnClickListener {
                                 memo.setText(title);
                             }
                             if (message.length()>35)
-
                             {
                                 mome_des.setText(message.subSequence(0,35)+"...");
                             }
@@ -493,17 +544,11 @@ public class HomePage extends Fragment implements View.OnClickListener {
                             {
                                 mome_des.setText(message);
                             }
-
                         }
-
-
-
                         JSONArray lists1= objects.getJSONArray("DashBoard Upcoming Holiday Data");
-                        Log.i("TAG","MyHolidays"+ lists1);
                         for (int i=0;i<lists1.length(); i++)
                         {
                             JSONObject object = lists1.getJSONObject(i);
-
                             String title = object.getString("holidayCategoryName");
                             String day = object.getString("dayName");
                             String message = object.getString("holidayCategoryDesc");
@@ -519,18 +564,13 @@ public class HomePage extends Fragment implements View.OnClickListener {
                             {
                                 hols_des.setText(message.subSequence(0,35)+"...");
                             }
+
                             else
                             {
                                 hols_des.setText(message);
                             }
-
                         }
-
-
-
                        // viewpopup();
-
-
                     }
                     catch (JSONException e)
                     {
@@ -547,9 +587,48 @@ public class HomePage extends Fragment implements View.OnClickListener {
             return null;
         }
     }
+    @Override
+    public void onResume() {
+        super.onResume();
+        getView().setFocusableInTouchMode(true);
+        getView().requestFocus();
+        getView().setOnKeyListener(new View.OnKeyListener()
+        {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (event.getAction() == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_BACK)
+                {
+                     doubleBackToExitPressedOnce = true;
+                    //Toast.makeText(getActivity(), "Please click BACK", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "Please click BACK again to exit", Toast.LENGTH_SHORT).show();
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            getView().setOnKeyListener(new View.OnKeyListener() {
+                                @Override
+                                public boolean onKey(View v, int keyCode, KeyEvent event) {
+                                    if (doubleBackToExitPressedOnce) {
+                                        if (event.getAction() == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_BACK) {
+                                            Intent intent = new Intent(Intent.ACTION_MAIN);
+                                            intent.addCategory(Intent.CATEGORY_HOME);
+                                            startActivity(intent);
+                                            doubleBackToExitPressedOnce = false;
+                                            return true;
+                                        }
+                                    }
+                                    return false;
+                                }
+                            });
+                        }
+                   }, 500);
+                    return true;
+                }
+                return false;
+            }
+        });
+    }
     void viewpopup()
     {
-
         try
         {
             View popupView =  LayoutInflater.from(getActivity()).inflate(R.layout.mypopup,
@@ -584,7 +663,7 @@ public class HomePage extends Fragment implements View.OnClickListener {
             if (!tempFile.isDirectory())
                 if (!tempFile.mkdirs())
                     return;
-            //Get application's name and convert to lowercase
+
             tempFile = new File(tempFile.getPath() + "/" + "appname" + ".apk");
             //If file doesn't exists create new
             if (!tempFile.exists()) {
@@ -592,7 +671,7 @@ public class HomePage extends Fragment implements View.OnClickListener {
                     return;
                 }
             }
-            //Copy file to new location
+
             InputStream in = new FileInputStream(file);
             OutputStream out = new FileOutputStream(tempFile);
 
@@ -615,6 +694,7 @@ public class HomePage extends Fragment implements View.OnClickListener {
             e.printStackTrace();
         }
     }
+
     public void dimBehind(PopupWindow popupWindow) {
         View container;
         if (popupWindow.getBackground() == null) {
@@ -648,7 +728,6 @@ public class HomePage extends Fragment implements View.OnClickListener {
             startActivity(intent);
         }
     }
-
     @Override
     public void onRequestPermissionsResult(int requestCode,  String permissions[], int[] grantResults) {
         switch (requestCode) {

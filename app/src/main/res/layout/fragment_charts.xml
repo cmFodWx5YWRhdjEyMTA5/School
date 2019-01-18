@@ -44,7 +44,7 @@
                     android:textSize="17dp"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:text="Student id "
+                    android:text="Class "
                     />
                 <TextView
                     android:layout_weight="1"

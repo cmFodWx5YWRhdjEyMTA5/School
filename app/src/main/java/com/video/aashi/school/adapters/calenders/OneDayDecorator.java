@@ -33,13 +33,11 @@ public class OneDayDecorator implements DayViewDecorator {
 
       switch (absent)
       {
-
           case "present":
               view.addSpan(new StyleSpan(Typeface.BOLD));
               view.addSpan(new RelativeSizeSpan(1f));
               view.addSpan(new ForegroundColorSpan(Color.parseColor("#FF4CD7C9")));
               break;
-
           case "absent":
               view.addSpan(new StyleSpan(Typeface.BOLD));
               view.addSpan(new RelativeSizeSpan(1f));
@@ -68,7 +66,7 @@ public class OneDayDecorator implements DayViewDecorator {
             view.addSpan(new StyleSpan(Typeface.BOLD));
             view.addSpan(new RelativeSizeSpan(1f));
             view.addSpan(new ForegroundColorSpan(Color.parseColor("#FF4081")));
-              // view.setBackgroundDrawable(Objects.requireNonNull(ContextCompat.getDrawable(context,R.drawable.bg_circle5)));
+            // view.setBackgroundDrawable(Objects.requireNonNull(ContextCompat.getDrawable(context,R.drawable.bg_circle5)));
           break;
           default:
           break;

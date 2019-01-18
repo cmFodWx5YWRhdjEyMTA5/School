@@ -172,6 +172,8 @@ public class Weekoffs extends Fragment {
                 @Override
                 public void onFailure(Call<ResponseBody> call, Throwable t) {
 
+                    progressDialog.dismiss();
+
 
                 }
             });

@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -24,6 +25,7 @@ public class Holidays extends Fragment {
     TabLayout tabLayout;
     ViewPager pager;
     public static String POSITION = "POSITION";
+    String check= "0";
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState)
@@ -40,6 +42,15 @@ public class Holidays extends Fragment {
         setupViewPager(pager);
         tabLayout.setupWithViewPager(pager);
         tabLayout.setTabTextColors(ColorStateList.valueOf(Color.parseColor("#20A4E8")));
+
+        Bundle bundle = getArguments();
+
+
+
+        if (bundle != null) {
+          check =     bundle.getString("check");
+        }
+
         return  view;
     }
     private void setupViewPager(ViewPager viewPager)
@@ -86,6 +97,31 @@ public class Holidays extends Fragment {
         menu.clear();
         inflater.inflate(R.menu.dashboard,menu);
         super.onCreateOptionsMenu(menu, inflater);
+    }
+    @Override
+    public void onResume() {
+        super.onResume();
+        getView().setFocusableInTouchMode(true);
+        getView().requestFocus();
+        getView().setOnKeyListener(new View.OnKeyListener()
+        {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (event.getAction() == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_BACK)
+                {
+                    if (check.equals("1"))
+                    {
+                        getFragmentManager().beginTransaction().replace(R.id.mycontainer,new HomePage()).commit();
+                    }
+                    else
+                    {
+                        getFragmentManager().beginTransaction().replace(R.id.mycontainer,new HomePage()).commit();
+                    }
+                    return true;
+                }
+                return false;
+            }
+        });
     }
 
 }

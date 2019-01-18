@@ -10,6 +10,7 @@
 
 
     <TextView
+
         android:gravity="center"
         android:text="NO MEMOS AVAILABLE"
         android:id="@+id/nomemo"

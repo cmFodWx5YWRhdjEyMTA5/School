@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:background="@color/grey"
+    android:layout_height="match_parent"
+    tools:context=".fragments.Settings">
+     <RelativeLayout
+         android:visibility="gone"
+         android:layout_margin="1dp"
+         android:background="@color/white"
+         android:layout_width="match_parent"
+         android:orientation="horizontal"
+         android:layout_height="wrap_content">
+
+      <TextView
+          android:layout_marginLeft="3dp"
+          android:textSize="18dp"
+          android:textColor="@color/black"
+          android:text="Authentication"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content" />
+          <Switch
+             android:id="@+id/autheentication"
+             android:layout_marginRight="3dp"
+             android:layout_alignParentRight="true"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content" />
+     </RelativeLayout>
+     <RelativeLayout
+        android:id="@+id/changePin"
+        android:padding="3dp"
+        android:layout_marginTop="5dp"
+        android:gravity="center"
+        android:layout_margin="1dp"
+        android:background="@color/white"
+        android:layout_width="match_parent"
+        android:layout_height="40dp">
+       <TextView
+           android:textStyle="bold"
+           android:layout_marginLeft="3dp"
+           android:gravity="center"
+           android:textSize="17dp"
+           android:textColor="@color/black"
+           android:text="Change pin"
+           android:layout_width="wrap_content"
+           android:layout_height="30dp" />
+         <ImageView
+             android:layout_marginRight="3dp"
+             android:backgroundTint="@color/colorPrimary"
+             android:layout_alignParentRight="true"
+             android:background="@drawable/ic_arrow_right"
+             android:layout_width="30dp"
+             android:layout_height="30dp" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/savePin"
+        android:padding="3dp"
+        android:layout_marginTop="5dp"
+
+        android:layout_margin="1dp"
+        android:background="@color/white"
+        android:layout_width="match_parent"
+        android:layout_height="40dp">
+
+        <TextView
+            android:layout_marginLeft="3dp"
+            android:gravity="center"
+            android:textSize="17dp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:text="Save pin"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp" />
+         <LinearLayout
+             android:visibility="gone"
+             android:orientation="horizontal"
+             android:layout_alignParentRight="true"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content">
+              <TextView
+                  android:visibility="gone"
+                  android:id="@+id/yourPin"
+                  android:layout_marginRight="5dp"
+                  android:layout_gravity="center"
+                  android:text="9876"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content" />
+
+             <android.support.v7.widget.CardView
+                 android:id="@+id/pinConfig"
+                 android:layout_marginLeft="3dp"
+                 android:paddingRight="4dp"
+                 app:cardCornerRadius="1dp"
+                 app:cardBackgroundColor="@color/flutter_blue"
+                 android:background="@drawable/ic_arrow_right"
+                 android:layout_width="wrap_content"
+                 android:layout_height="30dp">
+                 <TextView
+                     android:id="@+id/getText"
+                     android:textStyle="bold"
+                     android:textColor="@color/white"
+                     android:layout_marginRight="3dp"
+                     android:layout_marginLeft="3dp"
+                     android:layout_gravity="center"
+                     android:text="Remove"
+                     android:layout_width="wrap_content"
+                     android:layout_height="wrap_content" />
+         </android.support.v7.widget.CardView>
+         </LinearLayout>
+        <CheckBox
+            android:id="@+id/checkSave"
+            android:layout_marginLeft="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+
+
+    </LinearLayout>
+</LinearLayout>

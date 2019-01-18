@@ -40,7 +40,7 @@
                     android:textSize="17dp"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:text="Student id "
+                    android:text="Class "
                     />
                 <TextView
                     android:layout_weight="1"
@@ -162,7 +162,7 @@
             android:layout_height="match_parent">
             <android.support.v7.widget.CardView
                 app:cardBackgroundColor="@color/flutter_blue"
-                android:id="@+id/cardview"
+                android:id="@+id/cardviews"
                 android:layout_width="90dp"
                 android:layout_height="90dp"
                 android:shape="ring"

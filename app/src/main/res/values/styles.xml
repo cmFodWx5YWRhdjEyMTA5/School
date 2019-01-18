@@ -1,5 +1,4 @@
 <resources>
-
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:typeface">serif</item>
         <item name="colorPrimary">@color/colorPrimary</item>
@@ -20,13 +19,16 @@
     <style name="SCBSwitch" parent="Theme.AppCompat.Light">
         <!-- active thumb & track color (30% transparency) -->
         <item name="colorControlActivated">#46bdbf</item>
-
         <!-- inactive thumb color -->
         <item name="colorSwitchThumbNormal">#f1f1f1
         </item>
-
         <!-- inactive track color (30% transparency) -->
         <item name="android:colorForeground">#42221f1f
         </item>
     </style>
+    <style name="CalenderViewDateCustomText" parent="android:TextAppearance.DeviceDefault.Small">
+        <item name="android:textColor">@color/navy</item>
+    </style>
+
+
 </resources>

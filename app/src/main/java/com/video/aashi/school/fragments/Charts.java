@@ -3,7 +3,9 @@ package com.video.aashi.school.fragments;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -11,6 +13,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -19,6 +22,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.HorizontalBarChart;
 import com.github.mikephil.charting.data.BarData;
@@ -75,6 +79,7 @@ public class Charts extends Fragment {
     public static String accademicYearId;
 
     RecyclerView recyclerView;
+    CardView cardView;
      Retrofit retrofit;
     MyInterface myInterface;
     Paidadapters  paidadapters;
@@ -85,6 +90,8 @@ public class Charts extends Fragment {
   String mypercent;
  int myroundoff;
     List<Integer> myList = new ArrayList<Integer>();
+
+    List<Integer> myLists = new ArrayList<Integer>();
     List<MarksArray> marksArrays= new ArrayList<>();
 
 
@@ -104,6 +111,7 @@ public class Charts extends Fragment {
         classId = Navigation.class_id ;
         studentId    = Navigation.student_id;
         accademicYearId = Navigation.academicyear;
+
         studentid =(TextView)view.findViewById(R.id.myid);
         groupname =(TextView)view.findViewById(R.id.groups);
         termname =(TextView)view.findViewById(R.id.termname);
@@ -111,7 +119,8 @@ public class Charts extends Fragment {
         groupname.setText(Performance.groupname);
         termname.setText(Performance.termname);
         percent =(TextView)view.findViewById(R.id.percent);
-         Log.i("Tag","Myids"+examGroupId+locId+classId+studentId+ accademicYearId);
+        cardView =(CardView)view.findViewById(R.id.cardview);
+        Log.i("Tag","Myids"+examGroupId+locId+classId+studentId+ accademicYearId);
         OkHttpClient defaulthttpClient = new OkHttpClient.Builder()
                 .addInterceptor(
                         new Interceptor() {
@@ -133,6 +142,7 @@ public class Charts extends Fragment {
         recyclerView.setLayoutManager(layoutManager);
         myInterface = retrofit.create(MyInterface.class);
         new getMarks().execute();
+        cardView.setVisibility(View.GONE);
        return  view;
     }
     @Override
@@ -151,35 +161,51 @@ public class Charts extends Fragment {
                 @Override
                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                     String bodyString = null;
-                    try
+                    if (response.isSuccessful())
                     {
-                        bodyString  = response.body().string();
-                    }
-                    catch (IOException e)
-                    {
-                        e.printStackTrace();
-                    }
-                    Log.i("Tag","MyMarkss"+  call.request().url() + bodyString );
-                    {
-                        try {
-
-                            JSONObject object = new JSONObject(bodyString);
-                            JSONArray list = object.getJSONArray("Student Performance Chart Data");
-                            for (int i = 0; i < list.length(); i++)
-                            {
-                                String marks,subject;
-                                JSONObject data = list.getJSONObject(i);
-                                marks = data.getString("studAverage");
-                                subject = data.getString("subjectName");
-                                marksArrays.add(new MarksArray(marks,subject));
-                                paidadapters = new Paidadapters(marksArrays,getActivity());
-                                recyclerView.setAdapter(paidadapters);
-
-                            }
-                        } catch (JSONException e) {
+                        try
+                        {
+                            bodyString  = response.body().string();
+                        }
+                        catch (IOException e)
+                        {
                             e.printStackTrace();
                         }
+
+                        {
+                            try {
+
+                                JSONObject object = new JSONObject(bodyString);
+                                JSONArray list = object.getJSONArray("Student Performance Chart Data");
+                                for (int i = 0; i < list.length(); i++)
+                                {
+                                    String marks,subject;
+                                    JSONObject data = list.getJSONObject(i);
+                                    marks = data.getString("studAverage");
+                                    subject = data.getString("subjectName");
+                                    marksArrays.add(new MarksArray(marks,subject));
+                                    paidadapters = new Paidadapters(marksArrays,getActivity());
+                                    recyclerView.setAdapter(paidadapters);
+                                    Log.i("Tag","MyMarkss"+  marks);
+                                    if (!marks.isEmpty())
+                                    {
+                                     cardView.setVisibility(View.VISIBLE);
+                                    }
+
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
                     }
+                    else
+
+                    {
+                        Toast.makeText(getActivity(),"Something went wrong..!!",Toast.LENGTH_SHORT).show();
+
+                    }
+
+
                 }
 
                 @Override
@@ -220,18 +246,48 @@ public class Charts extends Fragment {
         {
             Random rnd = new Random();
             int color = Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256));
-            viewholder.mLowBar.set(color, Integer.parseInt(list.get(i).getStudAverage()));
+            int toatMarks =Integer.valueOf(Performance.maxmarks);
+            int finalMark = 0;
+            int average =Integer.parseInt(list.get(i).getStudAverage());
+
+
+
+            String totalmark = String.valueOf(list.size() * toatMarks);
+            if (toatMarks == 50)
+            {
+                finalMark = average * 2 ;
+
+            }
+            else if (toatMarks ==  75)
+            {
+                finalMark = (int) (average * 1.32 + 1);
+            }
+            else if (toatMarks == 100)
+            {
+                finalMark = average;
+            }
+            else if (toatMarks == 150)
+            {
+                finalMark    = average / 2 + 25;
+            }
+            else if (toatMarks == 200)
+            {
+                finalMark = average/2;
+            }
+            viewholder.mLowBar.set(color, finalMark);
             viewholder.textView.setText(list.get(i).getSubjectName());
-            viewholder.low_text.setText(getPercentage(Integer.parseInt(list.get(i).getStudAverage())));
-            String totalmark = String.valueOf(list.size() * 100);
+            viewholder.low_text.setText(getPercentage(finalMark));
             int values= Integer.parseInt(list.get(i).getStudAverage());
             total.setText(totalmark);
+            if (toatMarks == 0)
+            {
 
-
+            }
             String taa = null;
-            addMember(values);
+            addMember(finalMark);
+            addMembers(values);
              taa = String.valueOf(myroundoff);
-            String my = String.valueOf(myList.stream().mapToInt(value -> value).sum());
+            String my = String.valueOf(myLists.stream().mapToInt(value -> value).sum());
             Log.i("Tag","MyAdd"+ myList+my);
             percent.setText(myList.stream().mapToInt(value -> value).sum() /list.size()+ "%");
             roundoff.setText(my);
@@ -253,7 +309,8 @@ public class Charts extends Fragment {
     {
        BarView mLowBar;
          TextView textView,low_text;
-        public Viewholder(@NonNull View itemView) {
+        public Viewholder(@NonNull View itemView)
+        {
             super(itemView);
             low_text=(TextView)itemView.findViewById(R.id.low_text);
             mLowBar = (BarView)itemView. findViewById(R.id.low_bar);
@@ -266,9 +323,11 @@ public class Charts extends Fragment {
     }
     @SuppressLint("NewApi")
     public void addMember(Integer x) {
-
-
         myList.add(x);
+
+    };
+    public void addMembers(Integer x) {
+        myLists.add(x);
 
     };
 
