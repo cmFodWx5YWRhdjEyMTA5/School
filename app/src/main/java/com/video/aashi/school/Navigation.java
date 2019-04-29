@@ -59,6 +59,7 @@ import com.video.aashi.school.fragments.NoticeBoard;
 import com.video.aashi.school.fragments.PtaMee;
 import com.video.aashi.school.fragments.Settings;
 import com.video.aashi.school.fragments.TimeTable;
+import com.video.aashi.school.fragments.studentlist.StudentList;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -117,20 +118,29 @@ public class Navigation extends AppCompatActivity {
     int position;
     PopupWindow popupWindow;
     TextView topics,descrip;
-    public static String loginId,url,oName,parentName,studentName,parentPin,parentMob,userid;
-    SharedPreferences loginCredit;
+    SharedPreferences.Editor myEdit;
+
+    public static String session;
+    public static String loginId,url,oName,parentName,studentName,parentPin,parentMob,userid,MyUrl;
+    SharedPreferences loginCredit,sessions;
+    SharedPreferences.Editor sesEdit;
     private int currentMenuItem;
     private Fragment fragmentCurrent;
     boolean silent= true;
+    //String userImage;
     @SuppressLint("CommitPrefEdits")
     @RequiresApi(api = Build.VERSION_CODES.O_MR1)
     @Override
         protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_navigation);
-        loadHomeFragment();
         sharedPreferences = getApplicationContext().getSharedPreferences(MainActivity.PREF_NAME,MODE_PRIVATE);
         loginCredit = getSharedPreferences("pinValidate",MODE_PRIVATE);
+        editor =  loginCredit.edit();
+        sessions = getSharedPreferences(PinLogin.PREF_NAME,MODE_PRIVATE);
+        sesEdit =  sessions.edit();
+        myEdit = sessions.edit();
+        session = sessions.getString("session","");
         loginId = loginCredit.getString("loginId","");
         url = loginCredit.getString(  "url","");
         oName =  loginCredit.getString("oName","");
@@ -138,6 +148,7 @@ public class Navigation extends AppCompatActivity {
         studentName = loginCredit.getString("stuName","");
         parentMob = loginCredit.getString("mobiles","");
         userid = loginCredit.getString("userId","");
+        MyUrl  = url +"rest/ParentLoginRestWS/";
         sharedPreferencess =  getSharedPreferences("popup",MODE_PRIVATE);
         editors = sharedPreferencess.edit();
         username = sharedPreferences.getString("S_name","");
@@ -150,11 +161,13 @@ public class Navigation extends AppCompatActivity {
         examid = sharedPreferences.getString("examid","");
         emailids = sharedPreferences.getString("fathers","");
         s_class = sharedPreferences.getString("classname","");
+       String userImage = sharedPreferences.getString("photo","");
         Log.i("Tag","MyImages"+ academicyear+ student_id + url +parentMob);
+        loadHomeFragment();
         users =(TextView)findViewById(R.id.userna);
         ids=(TextView)findViewById(R.id.myids);
         users.setText(username);
-        ids .setText(s_class);
+        ids .setText("Class : " + s_class);
         toolbar =(Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle("Dashboard");
@@ -184,17 +197,17 @@ public class Navigation extends AppCompatActivity {
 
                             }
                         }).build();
-        retrofit =   new Retrofit.Builder().baseUrl(APIUrl.BASE_URL).addConverterFactory
+        retrofit =   new Retrofit.Builder().baseUrl(url +"rest/ParentLoginRestWS/").addConverterFactory
                 (GsonConverterFactory.create())
                 .client(defaulthttpClient)
                 .build();
         myInterface = retrofit.create(MyInterface.class);
               Picasso.get()
-                .load( APIUrl.IMAGE_URl+ user_image)
+                .load( url+ userImage)
                 .error(R.drawable.badge )
                 .transform(new CircleTransform())
                 .into(imageView);
-              Log.i("Tag","UserImages"+ APIUrl.IMAGE_URl+ user_image);
+              Log.i("Tag","UserImages"+ url + userImage);
         new getHomepage().execute();
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         drawerLayout=(DrawerLayout)findViewById(R.id.mydrawer);
@@ -210,7 +223,8 @@ public class Navigation extends AppCompatActivity {
            TypedArray imgs = getResources().obtainTypedArray(R.array.ld_activityScreenIcons);
            navigationAdapter = new NavigationAdapter(stringArrayList,imgs,Navigation.this);
            recyclerView.setAdapter(navigationAdapter);
-           drawerToggle =  new ActionBarDrawerToggle(this,drawerLayout,toolbar, R.string.navigation_drawer_open,R.string.navigation_drawer_close);
+           drawerToggle =  new ActionBarDrawerToggle(this,drawerLayout,toolbar,
+                   R.string.navigation_drawer_open,R.string.navigation_drawer_close);
 
 
 
@@ -296,7 +310,6 @@ public class Navigation extends AppCompatActivity {
                            MainInvoice invoicec = new MainInvoice();
                            showFragment(invoicec);
                        }
-
                        if (position == POS_PROFILE)
                        {
                           ProfileView profileView= new ProfileView();
@@ -307,7 +320,6 @@ public class Navigation extends AppCompatActivity {
                            PtaMee ptaMee = new PtaMee();
                            showFragment(ptaMee);
                        }
-
                        if (position == POS_SETTINGS)
                        {
                           showFragment(new Settings());
@@ -378,7 +390,7 @@ public class Navigation extends AppCompatActivity {
         @Override
         protected Object doInBackground(Object[] objects) {
             retrofit2.Call<ResponseBody> call = myInterface.getHome(new
-                    Home(class_id,student_id,location_id,general_id,"0",academicyear));
+                    Home(class_id,student_id,location_id,general_id,"0",academicyear,loginId,session));
             call.enqueue(new Callback<ResponseBody>() {
                 @SuppressLint("SetTextI18n")
                 @Override
@@ -388,12 +400,10 @@ public class Navigation extends AppCompatActivity {
                     {
                         bodyString  = response.body().string();
                     }
-
                     catch (IOException e)
                     {
                         e.printStackTrace();
                     }
-
                     try
                     {
                        JSONObject objects =  new JSONObject(bodyString);
@@ -499,9 +509,18 @@ public class Navigation extends AppCompatActivity {
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Intent intent = new Intent(Intent.ACTION_MAIN);
-                        intent.addCategory(Intent.CATEGORY_HOME);
-                        startActivity(intent);
+                        editor.clear();
+                        editor.remove("isLogin");
+                        myEdit.clear();
+                        editors.clear();
+                        editor.apply();
+                        editors.apply();
+                        myEdit.apply();
+                        sesEdit.clear();
+                        sesEdit.apply();
+                        Intent i = new Intent(Navigation.this,PinLogin.class);
+                        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(i);
                     }
                 })
                 .setNegativeButton("No", new DialogInterface.OnClickListener() {

@@ -4,8 +4,10 @@ package com.video.aashi.school.fragments;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.ActivityOptions;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
@@ -17,6 +19,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.BottomNavigationView;
@@ -27,6 +30,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.CardView;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.telecom.Call;
 import android.util.Log;
 import android.util.Pair;
@@ -57,16 +62,20 @@ import com.video.aashi.school.MainActivity;
 import com.video.aashi.school.Myclass;
 import com.video.aashi.school.Navigation;
 import com.video.aashi.school.Performance;
+import com.video.aashi.school.PinLogin;
 import com.video.aashi.school.ProfileView;
 import com.video.aashi.school.R;
+import com.video.aashi.school.adapters.Expired;
 import com.video.aashi.school.adapters.Interfaces.CircleTransform;
 import com.video.aashi.school.adapters.Interfaces.DatabaseHelper;
 import com.video.aashi.school.adapters.Interfaces.MyInterface;
 import com.video.aashi.school.adapters.arrar_adapterd.Name;
+import com.video.aashi.school.adapters.arrar_adapterd.Students;
 import com.video.aashi.school.adapters.drawer.BottomNavigationViewHelper;
 import com.video.aashi.school.adapters.local.DateLocal;
 import com.video.aashi.school.adapters.post_class.Attend;
 import com.video.aashi.school.adapters.post_class.Home;
+import com.video.aashi.school.fragments.studentlist.StudentList;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -92,6 +101,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+import static android.content.Context.LAYOUT_INFLATER_SERVICE;
 import static android.content.Context.MODE_PRIVATE;
 
 /**
@@ -119,7 +129,7 @@ public class HomePage extends Fragment implements View.OnClickListener {
      public static String userName,s_class,mobile,image;
     FrameLayout performance;
      TextView getClassname;
-    SharedPreferences sharedPreferences;
+    SharedPreferences sharedPreferences,loginCredit;
     FrameLayout timetable;
     ImageView perfor,time;
     String classId;
@@ -132,15 +142,26 @@ public class HomePage extends Fragment implements View.OnClickListener {
     MyInterface myInterface;
     TextView homework,home_ds,hols,hols_des,memo,mome_des,notice,notice_des;
     TextView view_hols,view_memo,view_notice,view_home;
-    SharedPreferences sharedPreferencess;
+    SharedPreferences sharedPreferencess,shared;
     SharedPreferences.Editor editors;
     ImageView findstudent;
     TextView topics,descrip;
     String showpop;
     String aca_year;
-    String monthName;
+    String monthName,schoolname;
     DateLocal db;
+    public  static  String url;
+     public  static   String urls;
+     SharedPreferences.Editor editor,editor2;
     static boolean doubleBackToExitPressedOnce = false;
+    LinearLayout myHomework,mememos,myHoidays,myNotice;
+    RecyclerView recyclerView;
+    PopupWindow editPop;
+    View mView;
+    SharedPreferences mysession;
+    SharedPreferences.Editor sess;
+    TextView schoolName;
+    int visible = 0;
     @SuppressLint({"SetTextI18n", "NewApi", "CommitPrefEdits"})
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -148,21 +169,45 @@ public class HomePage extends Fragment implements View.OnClickListener {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
        View view = inflater.inflate(R.layout.fragment_home_page, container, false);
+
         sharedPreferences = getActivity().getSharedPreferences(MainActivity.PREF_NAME,MODE_PRIVATE);
         sharedPreferencess = getActivity().getSharedPreferences("popup",MODE_PRIVATE);
+        loginCredit = getActivity(). getSharedPreferences("pinValidate",MODE_PRIVATE);
+        mysession = getActivity(). getSharedPreferences("MySession",MODE_PRIVATE);
+        sess = mysession.edit();
+        shared = getActivity().getSharedPreferences("loginstatus",MODE_PRIVATE);
         editors = sharedPreferencess.edit();
+        editor = loginCredit.edit();
+        editor2 = shared.edit();
+        url = loginCredit.getString(  "url","");
+        urls = loginCredit.getString(  "url","");
+        url = url +"rest/ParentLoginRestWS/";
+        getActivity().setTitle("EaziEd");
         showpop = sharedPreferencess.getString("mykey","");
+        myHomework =(LinearLayout)view.findViewById(R.id.myHomeworks);
+        mememos =(LinearLayout)view.findViewById(R.id.myMemoss);
+        myHoidays =(LinearLayout)view.findViewById(R.id.myHolodays);
+        myNotice =(LinearLayout)view.findViewById(R.id.myNoticeboard);
         findstudent =(ImageView)view.findViewById(R.id.findstudent);
         user_name =(TextView)view.findViewById(R.id.user_name);
         performance=(FrameLayout)view.findViewById(R.id.performance);
         getClassname =(TextView)view.findViewById(R.id.s_class);
         mobileno =(TextView)view.findViewById(R.id.mobileno);
         profile =(ImageView) view.findViewById(R.id.profile_image);
+        schoolName  =(TextView)view.findViewById(R.id.scholNames);
         db = new DateLocal(getActivity());
         userName =  sharedPreferences.getString("S_name","");
         s_class = sharedPreferences.getString("classname","");
         mobile = sharedPreferences.getString("mobile","");
         image = sharedPreferences.getString("photo","");
+        schoolname =  sharedPreferences.getString("schoolName","");
+        if (schoolname != null)
+        {
+            schoolName.setText(schoolname);
+        }
+
+        visible = shared.getInt("visible",0);
+      //  Navigation.userImage = image;
         perfor =(ImageView)view.findViewById(R.id.performance1);
         time=(ImageView)view.findViewById(R.id.timetable1);
         homework =(TextView)view.findViewById(R.id.homework_heaf);
@@ -189,7 +234,11 @@ public class HomePage extends Fragment implements View.OnClickListener {
         view_memo.setOnClickListener(this);
         view_notice.setOnClickListener(this);
         view_home.setOnClickListener(this);
-        Log.i("Tag","UserNames"+ s_class + image);
+        myHomework.setOnClickListener(this);
+        mememos.setOnClickListener(this);
+        myHoidays.setOnClickListener(this);
+        myNotice.setOnClickListener(this);
+        Log.i("Tag","UserNames"+ s_class + image+url);
         int navDefaultTextColor = Color.parseColor("#202020");
        // bnav =(BottomNavigationView)view.findViewById(R.id.bottomnav);
         //bnav1=(BottomNavigationView)view.findViewById(R.id.bottomnav1);
@@ -197,7 +246,7 @@ public class HomePage extends Fragment implements View.OnClickListener {
        // BottomNavigationViewHelper.disableShiftMode(bnav1);
         timetable =(FrameLayout)view.findViewById(R.id.timetable);
         user_name.setText(userName  );
-        getClassname.setText("class "+ s_class);
+        getClassname.setText("Class : "+ s_class);
         mobileno.setText(mobile);
         collapsingToolbarLayout =(CollapsingToolbarLayout)view.findViewById(R.id.colapse);
         AppBarLayout appBarLayout = (AppBarLayout)view. findViewById(R.id.app_bar);
@@ -217,7 +266,7 @@ public class HomePage extends Fragment implements View.OnClickListener {
                                 return chain.proceed(request);
                             }
                         }).build();
-        retrofit =   new Retrofit.Builder().baseUrl(APIUrl.BASE_URL).addConverterFactory
+        retrofit =   new Retrofit.Builder().baseUrl(url ).addConverterFactory
                 (GsonConverterFactory.create())
                 .client(defaulthttpClient)
                 .build();
@@ -248,10 +297,9 @@ public class HomePage extends Fragment implements View.OnClickListener {
             public void onClick(View v) {
                 ExamCombo performances = new ExamCombo();
                 Bundle bundle= new Bundle();
-                bundle.putString("combo","1");
                 bundle.putString("check","1");
-
                 performances.setArguments(bundle);
+                bundle.putString("combo","1");
                 getFragmentManager().beginTransaction().replace(R.id.mycontainer,performances).
                         addToBackStack(null).commit();
             }
@@ -278,19 +326,17 @@ public class HomePage extends Fragment implements View.OnClickListener {
                 performance.setArguments(bundle);
                 getFragmentManager().beginTransaction().replace(R.id.mycontainer,performance).
                         addToBackStack(null).commit();
-
             }
         });
        Picasso.get()
-                .load(APIUrl.IMAGE_URl+ image)
+                .load(urls+ image)
                 .error(R.drawable.badge )
                 .transform(new CircleTransform())
                 .into(profile);
-      // loadDatas();
+
         appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
             @Override
             public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
-
                 if (Math.abs(verticalOffset)-appBarLayout.getTotalScrollRange() == 0)
                 {
 
@@ -333,18 +379,6 @@ public class HomePage extends Fragment implements View.OnClickListener {
 
          menu.clear();
         inflater.inflate(R.menu.multiply,menu);
-
-      //  textCartItemCount = (TextView) actionView.findViewById(R.id.cart_badge);
-
-      /* setupBadge();
-
-        actionView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onOptionsItemSelected(menuItem);
-            }
-        });
-        */
         super.onCreateOptionsMenu(menu, inflater);
     }
     @Override
@@ -365,6 +399,9 @@ public class HomePage extends Fragment implements View.OnClickListener {
             case R.id.qrcode:
                 launchActivity(BarScanner.class);
                 break;
+            case R.id.switchs:
+                editPop();
+                break;
             default:
                 break;
 
@@ -374,6 +411,20 @@ public class HomePage extends Fragment implements View.OnClickListener {
 
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
+
+        MenuItem register = menu.findItem(R.id.switchs);
+        if (register != null)
+        {
+            if(visible == 1)
+            {
+                register.setVisible(true);
+            }
+            else
+            {
+                register.setVisible(false);
+            }
+        }
+
         super.onPrepareOptionsMenu(menu);
     }
 
@@ -385,20 +436,37 @@ public class HomePage extends Fragment implements View.OnClickListener {
             case R.id.view_hols:
                 Holidays holidays = new Holidays();
                 showFragment(holidays);
-
+                break;
+            case R.id.myHolodays:
+                Holidays holidayss = new Holidays();
+                showFragment(holidayss);
                 break;
             case R.id.view_homework:
                 Homework homework = new Homework();
                 showFragment(homework);
+                break;
+            case R.id.myHomeworks:
+                Homework homeworks = new Homework();
+                showFragment(homeworks);
                 break;
             case R.id.view_notice:
                 NoticeBoard noticeBoard=new NoticeBoard();
                 showFragment(noticeBoard);
 
                 break;
+            case R.id.myNoticeboard:
+                NoticeBoard noticeBoards=new NoticeBoard();
+                showFragment(noticeBoards);
+
+                break;
             case R.id.view_memo:
                 Memos memos=new Memos();
                 showFragment(memos);
+
+                break;
+            case R.id.myMemoss:
+                Memos memoss=new Memos();
+                showFragment(memoss);
 
                 break;
                 default:
@@ -424,7 +492,7 @@ public class HomePage extends Fragment implements View.OnClickListener {
         @Override
         protected void onPreExecute() {
 
-      //      ProgressDialog progressDialog=  new ProgressDialog();
+         //ProgressDialog progressDialog=  new ProgressDialog();
 
             super.onPreExecute();
         }
@@ -433,17 +501,16 @@ public class HomePage extends Fragment implements View.OnClickListener {
         protected Object doInBackground(Object[] objects) {
 
             retrofit2.Call<ResponseBody> call = myInterface.getHome(new Home
-                    (classId,studentId,locId,classGeneralId,viewMore,academicYearId));
-
-            //Log.i("Tag","MyHomePage"+)
-
+                    (classId,studentId,locId,classGeneralId,viewMore,academicYearId,
+                            Navigation.loginId,Navigation.session));
             call.enqueue(new Callback<ResponseBody>() {
                 @SuppressLint("SetTextI18n")
                 @Override
                 public void onResponse(retrofit2.Call<ResponseBody> call, Response<ResponseBody> response) {
                     String bodyString = null;
-                    Log.i("Tag","MyHomePage"+call.request().url()+classId+studentId+locId+
+                    Log.i("Tag","MyHomePage"+call.request().url() + classId + studentId+locId+
                             classGeneralId+viewMore+academicYearId);
+                    String errorMessage;
                     try
                     {
                         bodyString  = response.body().string();
@@ -452,122 +519,135 @@ public class HomePage extends Fragment implements View.OnClickListener {
                     {
                         e.printStackTrace();
                     }
-
-
                     try
                     {
-
-                        JSONObject objects =  new JSONObject(bodyString);
-                        JSONArray object1 =  objects.getJSONArray("DashBoard HomeWork Data");
-                        for (int i = 0; i < object1.length(); i++)
+                       JSONObject objects =  new JSONObject(bodyString);
+                       errorMessage = objects.getString("errorMessage");
+                       String   failure = objects.getString("status");
+                        errorMessage = objects.getString("errorMessage");
+                        if  (failure.contains("failure"))
                         {
-                            JSONObject object = object1.getJSONObject(i);
-                            String  home_hea = object.   getString  ("chapter");
-                            String ho_des = object.getString("homeWorkDesc");
-                            String sub = object.getString("subject");
-                            if(home_hea.length() >35)
-                            {
-                                homework.setText(home_hea.subSequence(0,35)+"..."   + "  ("+ sub+")" );
-                            }
-                            else
-                            {
-                                homework.setText(home_hea+"..."   + "  ("+ sub+")" );
-                            }
-                            if (ho_des.length() >35)
-                            {
-                                home_ds.setText(ho_des.subSequence(0,35)+"...");
+                            String finalErrorMessage = errorMessage;
+                            Expired expired = new Expired( getActivity(),  finalErrorMessage);
+                            expired.setTitle(finalErrorMessage);
+                            expired.setCancelable(false);
 
-                            }
-                            else
-                            {
-                                home_ds.setText(ho_des);
-
-                            }
-
+                            expired.setPositiveButton("OK", (dialog1, which) -> {
+                                expired.getSharedPreferences();
+                                Intent i = new Intent(getActivity(),PinLogin.class);
+                                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                startActivity(i);
+                            });
+                            expired.show();
+//                            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity() );
+//
+//                            builder.setMessage(errorMessage)
+//                                    .setCancelable(false)
+//                                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+//                                        public void onClick(DialogInterface dialog, int id) {
+//
+//
+//                                            editors.clear();
+//                                            sess.putBoolean("isLogins",true);
+//
+//                                            editors.apply();
+//                                            sess.apply();
+//
+//                                        }
+//                                    });
+//
+//
+//                            AlertDialog alert = builder.create();
+//                            alert.setIcon(R.drawable.ic_error_outline_red_500_24dp);
+//                            alert.setCancelable(false);
+//                            alert.show();
+                            //    Toast.makeText(getApplicationContext(),errorMessage,Toast.LENGTH_SHORT).show();
 
                         }
-                        JSONArray list= objects.getJSONArray("DashBoard NoticeBoard Data");
-                        for (int i=0;i<list.length(); i++)
+                        else
                         {
-                            JSONObject object = list.getJSONObject(i);
+                            JSONArray object1 = objects.getJSONArray("DashBoard HomeWork Data");
+                            for (int i = 0; i < object1.length(); i++) {
+                                JSONObject object = object1.getJSONObject(i);
+                                String home_hea = object.getString("chapter");
+                                String ho_des = object.getString("homeWorkDesc");
+                                String sub = object.getString("subject");
+                                if (home_hea.length() > 35) {
+                                    homework.setText(home_hea.subSequence(0, 35) + "..." + "  (" + sub + ")");
+                                } else {
+                                    homework.setText(home_hea + "..." + "  (" + sub + ")");
+                                }
+                                if (ho_des.length() > 35) {
+                                    home_ds.setText(ho_des.subSequence(0, 35) + "...");
 
-                            titles = object.getString("noticeBoardTitle");
-                           messages = object.getString("noticeMessage");
+                                } else {
+                                    home_ds.setText(ho_des);
 
-                            if (titles.length() >35)
-                            {
-                                notice.setText(titles.subSequence(0,35)+"...");
-                            }
-                            else
-                            {
-                                notice.setText(titles);
-                            }
-                            if (messages.length()>35)
+                                }
 
-                            {
-                                notice_des.setText(messages.subSequence(0,35)+"...");
-                            }
-                            else
-                            {
-                                notice_des.setText(messages);
-                            }
-                            String noticeid;
-                            noticeid    = object.getString("noticeBoardId");
-                            Log.i("Tag","MyNavi"+ list);
-                            if (!noticeid.equals(showpop))
-                            {
-                                editors.putString("mykey",  noticeid);
-                                editors.apply();
-                                viewpopup();
-                            }
-                        }
-                        JSONArray lists= objects.getJSONArray("DashBoard MemoBoard Data");
-                        for (int i=0;i<lists.length(); i++)
-                        {
-                            JSONObject object = lists.getJSONObject(i);
-                            String title = object.getString("memoTypeName");
-                            String message = object.getString("remarks");
-                            Log.i("TAG","MyHolidays"+ title+message );
-                            if (title.length() >35)
-                            {
-                                memo.setText(title.subSequence(0,35)+"...");
-                            }
-                            else
-                            {
-                                memo.setText(title);
-                            }
-                            if (message.length()>35)
-                            {
-                                mome_des.setText(message.subSequence(0,35)+"...");
-                            }
-                            else
-                            {
-                                mome_des.setText(message);
-                            }
-                        }
-                        JSONArray lists1= objects.getJSONArray("DashBoard Upcoming Holiday Data");
-                        for (int i=0;i<lists1.length(); i++)
-                        {
-                            JSONObject object = lists1.getJSONObject(i);
-                            String title = object.getString("holidayCategoryName");
-                            String day = object.getString("dayName");
-                            String message = object.getString("holidayCategoryDesc");
-                            if (title.length() >35)
-                            {
-                                hols.setText(title.subSequence(0,35)+"..." +" ("+ day +")");
-                            }
-                            else
-                            {
-                                hols.setText(title+"  ("+ day +")");
-                            }
-                            if (message.length()>35)
-                            {
-                                hols_des.setText(message.subSequence(0,35)+"...");
-                            }
 
-                            else
-                            {
-                                hols_des.setText(message);
+                            }
+                            JSONArray list = objects.getJSONArray("DashBoard NoticeBoard Data");
+                            for (int i = 0; i < list.length(); i++) {
+                                JSONObject object = list.getJSONObject(i);
+
+                                titles = object.getString("noticeBoardTitle");
+                                messages = object.getString("noticeMessage");
+
+                                if (titles.length() > 35) {
+                                    notice.setText(titles.subSequence(0, 35) + "...");
+                                } else {
+                                    notice.setText(titles);
+                                }
+                                if (messages.length() > 35)
+
+                                {
+                                    notice_des.setText(messages.subSequence(0, 35) + "...");
+                                } else {
+                                    notice_des.setText(messages);
+                                }
+                                String noticeid;
+                                noticeid = object.getString("noticeBoardId");
+                                Log.i("Tag", "MyNavi" + list);
+                                if (!noticeid.equals(showpop)) {
+                                    editors.putString("mykey", noticeid);
+                                    editors.apply();
+                                    viewpopup();
+                                }
+                            }
+                            JSONArray lists = objects.getJSONArray("DashBoard MemoBoard Data");
+                            for (int i = 0; i < lists.length(); i++) {
+                                JSONObject object = lists.getJSONObject(i);
+                                String title = object.getString("memoTypeName");
+                                String message = object.getString("remarks");
+                                Log.i("TAG", "MyHolidays" + title + message);
+                                if (title.length() > 35) {
+                                    memo.setText(title.subSequence(0, 35) + "...");
+                                } else {
+                                    memo.setText(title);
+                                }
+                                if (message.length() > 35) {
+                                    mome_des.setText(message.subSequence(0, 35) + "...");
+                                } else {
+                                    mome_des.setText(message);
+                                }
+                            }
+                            JSONArray lists1 = objects.getJSONArray("DashBoard Upcoming Holiday Data");
+                            for (int i = 0; i < lists1.length(); i++) {
+                                JSONObject object = lists1.getJSONObject(i);
+                                String title = object.getString("holidayCategoryName");
+                                String day = object.getString("dayName");
+                                String message = object.getString("holidayCategoryDesc");
+                                if (title.length() > 35) {
+                                    hols.setText(title.subSequence(0, 35) + "..." + " (" + day + ")");
+                                } else {
+                                    hols.setText(title + "  (" + day + ")");
+                                }
+                                if (message.length() > 35) {
+                                    hols_des.setText(message.subSequence(0, 35) + "...");
+                                } else {
+                                    hols_des.setText(message);
+                                }
                             }
                         }
                        // viewpopup();
@@ -743,4 +823,247 @@ public class HomePage extends Fragment implements View.OnClickListener {
                 return;
         }
     }
+    void editPop()
+    {
+        LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(LAYOUT_INFLATER_SERVICE);
+        mView = inflater.inflate(R.layout.switch_layout, null);
+
+        recyclerView = mView.findViewById(R.id.studentsRecycle);
+
+
+
+        editPop = new PopupWindow(
+                mView,
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        new getList().execute();
+
+    }
+    class getList extends AsyncTask
+    {
+        MyInterface myInterfacee;
+        ArrayList<Students> students;
+        @Override
+        protected void onPreExecute() {
+            Retrofit retrofit;
+
+
+            OkHttpClient defaulthttpClient = new OkHttpClient.Builder()
+                    .addInterceptor(
+                            new Interceptor() {
+                                @Override
+                                public okhttp3.Response intercept(Chain chain) throws IOException {
+                                    Request request = chain.request().newBuilder()
+                                            .addHeader("Content-Type", "application/json").build();
+                                    return chain.proceed(request);
+                                }
+                            }).build();
+
+            retrofit = new Retrofit.Builder().baseUrl(HomePage.url).addConverterFactory
+                    (GsonConverterFactory.create())
+                    .client(defaulthttpClient)
+                    .build();
+            myInterfacee = retrofit.create(MyInterface.class);
+            final LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+            layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+            recyclerView.setLayoutManager(layoutManager);
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Object doInBackground(Object[] objects) {
+            retrofit2.Call<ResponseBody> call = myInterfacee.getStudentList(new com.video.aashi.school.adapters.post_class.StudentList(
+                    Navigation.loginId  , Navigation.parentPin ,Navigation.session ));
+            call.enqueue(new Callback<ResponseBody>() {
+                @Override
+                public void onResponse(retrofit2.Call<ResponseBody> call, Response<ResponseBody> response) {
+                    students = new ArrayList<>();
+                    if (response.isSuccessful()) {
+                        try {
+                            String  sstudentId,locationid,genid,classid,studentpic,acyearid,examid,classname,mobile;
+                            String studentPhotoPath,passwor,users,fatherEmailId,active,sessionss;
+                            String age,name,image,dob,classes,rolno;
+                            String bodyString = null;
+                            bodyString = response.body().string();
+                            Log.i("Tag","MyStudents"+ Navigation.loginId  + Navigation.parentPin+Navigation.session);
+                            JSONObject object = new JSONObject(bodyString);
+                            JSONArray list = object.getJSONArray("Student List");
+                            for (int i = 0;i<list.length();i++)
+                            {
+                                if (list.length() ==0)
+                                {
+
+                                }
+                                else
+                                {
+                                    JSONObject jsonObject = list.getJSONObject(i);
+                                    age = jsonObject.getString("studentAge");
+                                    name = jsonObject.getString("studentFirstName");
+                                    image = jsonObject.getString("studentPhotoPath");
+                                    dob = jsonObject.getString("studentDobDisp");
+                                    classes = jsonObject.getString("currentClassGenCd");
+                                    rolno = jsonObject.getString("rollNo");
+                                    sstudentId = jsonObject.getString("studentId");
+                                    locationid = jsonObject.getString("locationId");
+                                    genid = jsonObject.getString("currentClassGenId");
+                                    classid = jsonObject.getString("currentClassId");
+                                    acyearid = jsonObject.getString("currentAcademicYrId");
+                                    examid = jsonObject.getString("examTermGroupId");
+                                    classname =  jsonObject.getString("currentClassCd");
+                                    mobile = jsonObject.getString("mobileNo");
+                                    passwor = jsonObject.getString("parentPasswordDisp");
+                                    users = jsonObject.getString("studParentCode");
+                                    fatherEmailId = jsonObject.getString("fatherEmailId");
+                                    sessionss = jsonObject.getString("mobSession");
+                                    String s_name = jsonObject.getString("studentFirstName");
+                                    String s_class = jsonObject.getString("currentClassCd");
+                                    String academicyear = jsonObject.getString("currentAcademicYr");
+                                    String city = jsonObject.getString("studentPlace");
+                                    String gendre = jsonObject.getString("genderDisp");
+                                    String middlename = jsonObject.getString("studentMiddleName");
+                                    String lastnmame = jsonObject.getString("studentLastName");
+                                    String fathersnme = jsonObject.getString("fatherName");
+                                    String mobleno = jsonObject.getString("mobileNo");
+                                    String pincode = jsonObject.getString("pincode");
+                                    String state = jsonObject.getString("state");
+                                    String studentNationality =  jsonObject.getString("studentNationality");
+                                    String motherName = jsonObject.getString("motherName");
+                                    String registration = jsonObject.getString("registrationNo");
+                                    String joineddate = jsonObject.getString("joiningDtDisp");
+                                    String joinedyear = jsonObject.getString("joiningAcademicYr");
+                                    String rollno = jsonObject.getString("rollNo");
+                                    String bloodgroups = jsonObject.getString("studentBloodGroup");
+                                    String schoolName = jsonObject.getString("locationName");
+                                    students .add(new Students(name,image,rolno,age,classes,dob,sstudentId,locationid,genid,classid,acyearid
+                                            ,examid,classname,mobile,passwor,users,fatherEmailId,sessionss,s_name,s_class,academicyear,city,gendre,
+                                            middlename,lastnmame,fathersnme,mobleno,pincode,state,fatherEmailId, studentNationality,motherName,registration,joineddate,joinedyear
+                                            ,rollno,bloodgroups,schoolName ));
+                                    recyclerView.setAdapter(new StudentAdpter(getActivity(),students));
+
+                                }
+                            }
+                        }
+                        catch (IOException  | JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    else
+                    {
+                        Toast.makeText(getActivity(),"Something went wrong..!",Toast.LENGTH_SHORT).show();
+                    }
+                }
+                @Override
+                public void onFailure(retrofit2.Call<ResponseBody> call, Throwable t) {
+                }
+            });
+            return null;
+        }
+        @Override
+        protected void onPostExecute(Object o) {
+            editPop.setFocusable(true);
+            editPop.setAnimationStyle(R.style.popupanimation);
+            editPop.showAtLocation(mView, Gravity.BOTTOM|Gravity.END, 0, 0);
+            dimBehind(editPop);
+            super.onPostExecute(o);
+        }
+    }
+    class StudentAdpter extends RecyclerView.Adapter<Settings.ViewHoler>
+    {
+        Context context;
+        ArrayList<Students> students;
+
+        public  StudentAdpter (Context context,ArrayList<Students> students)
+        {
+            this.context = context;
+            this.students = students;
+        }
+        @NonNull
+        @Override
+        public Settings.ViewHoler onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+            View view = LayoutInflater.from(getActivity()).inflate(R.layout.students, viewGroup, false);
+            return new Settings.ViewHoler(view);
+        }
+        @Override
+        public void onBindViewHolder(@NonNull Settings.ViewHoler holder, int position) {
+            Students studentss = students.get(position);
+            holder.name.setText(students.get(position).getName() );
+            holder.age.setText(students.get(position).getAge() );
+            holder.classes.setText(students.get(position).getClassses() );
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+                Picasso.get()
+                        .load( StudentList.url+ students.get(position).getImage())
+                        .error(R.drawable.download )
+                        .transform(new CircleTransform())
+                        .into(holder.imageView);
+
+            }
+            holder.studentCard.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View v) {
+                    editor2.putString("StudentId", studentss.getStudentId());
+                    editor2.putString("S_name",studentss.getName());
+                    editor2.putString("location_id",studentss.getLocationId());
+                    editor2.putString("gen_id",studentss.getGenId());
+                    editor2.putString("class_id",studentss.getClassId());
+                    editor2.putString("image", studentss.getImage());
+                    editor2.putString("academic",studentss.getAcayesr());
+                    editor2.putString("examid",studentss.getExamId());
+                    editor2.putString("classname"  , studentss.getClassname());
+                    editor2.putString("mobile", studentss.getMobile());
+                    editor2.putString("photo",studentss.getImage());
+                    editor2.putString("fathers", studentss.getFatherId());
+                    editor2.putString("session",Navigation.session);
+                    editor2.putInt("student",position);
+                    editor2.putString("studentFirstName",studentss.getName());
+                    editor2.putString("currentClassCd",studentss.getS_class());
+                    editor2.putString("studentMiddleName",studentss.getMiddlename());
+                    editor2.putString("studentLastName",studentss.getLastnmame());
+                    editor2.putString("studentPlace",studentss.getCity());
+                    editor2.putString("state",studentss.getState());
+                    editor2.putString("pincode",studentss.getPincode());
+                    editor2.putString("mobileNo",studentss.getMobleno());
+                    editor2.putString("motherName",studentss.getMotherName());
+                    editor2.putString("currentAcademicYr",studentss.getAcademicyear());
+                    editor2.putString("genderDisp",studentss.getGendre());
+                    editor2.putString("studentNationality",studentss.getStudentNationality());
+                    editor2.putString("fatherEmailId",studentss.getFatherEmailId());
+                    editor2.putString("fatherName",studentss.getFathersnme());
+                    editor2.putString("studentAge",studentss.getAge());
+                    editor2.putString("registrationNo",studentss.getRegistration());
+                    editor2.putString("joiningDtDisp",studentss.getJoinedDate());
+                    editor2.putString("joiningAcademicYr",studentss.getYearJoined());
+                    editor2.putString("studentDobDisp",studentss.getDob());
+                    editor2.putString("rollNo",studentss.getRollNo());
+                    editor2.putString("studentBloodGroup",studentss.getBlood_group());
+                    editor2.putString("schoolName",studentss.getSchoolName());
+                    editor2.apply();
+                    Intent i=new Intent(getActivity(),Navigation.class);
+                    i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(i);
+                }
+            });
+        }
+        @Override
+        public int getItemCount() {
+            return students.size();
+        }
+    }
+    public  static class  ViewHoler extends RecyclerView.ViewHolder
+    {
+
+        ImageView imageView;
+        TextView classes,age,name;
+        CardView studentCard;
+        public ViewHoler(@NonNull View itemView) {
+            super(itemView);
+            imageView =(ImageView)itemView.findViewById(R.id.myImage);
+            classes =(TextView)itemView.findViewById(R.id.myClass);
+            age =(TextView)itemView.findViewById(R.id.myAge);
+            studentCard =(CardView)itemView.findViewById(R.id.studentCard);
+            name =(TextView)itemView.findViewById(R.id.myName);
+        }
+    }
+
 }

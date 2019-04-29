@@ -3,12 +3,12 @@ package com.video.aashi.school.adapters.post_class;
 public class Login {
 
 
-     String userName;
-      String password;
+     String parentLoginCode;
+      String pin;
 
-      public Login(String userName,String password)
+      public Login(String parentLoginCode,String pin)
       {
-          this.userName = userName;
-          this.password = password;
+          this.parentLoginCode = parentLoginCode;
+          this.pin = pin;
       }
 }

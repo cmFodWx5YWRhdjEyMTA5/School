@@ -26,11 +26,14 @@ import com.video.aashi.school.APIUrl;
 import com.video.aashi.school.MainActivity;
 import com.video.aashi.school.Navigation;
 import com.video.aashi.school.Payment;
+import com.video.aashi.school.PinLogin;
 import com.video.aashi.school.R;
+import com.video.aashi.school.adapters.Expired;
 import com.video.aashi.school.adapters.Interfaces.MyInterface;
 import com.video.aashi.school.adapters.arrar_adapterd.Invoice_array;
 import com.video.aashi.school.adapters.post_class.Invoic;
 import com.video.aashi.school.adapters.post_class.Ivoices;
+import com.video.aashi.school.fragments.HomePage;
 import com.video.aashi.school.fragments.MainInvoice;
 
 import org.json.JSONArray;
@@ -96,7 +99,7 @@ public class Invoice extends Fragment {
                                 return chain.proceed(request);
                             }
                         }).build();
-        retrofit =   new Retrofit.Builder().baseUrl(APIUrl.BASE_URL).addConverterFactory
+        retrofit =   new Retrofit.Builder().baseUrl(HomePage.url).addConverterFactory
                 (GsonConverterFactory.create())
                 .client(defaulthttpClient)
                 .build();
@@ -125,7 +128,7 @@ public class Invoice extends Fragment {
         }
         @Override
         protected Object doInBackground(Object[] objects) {
-            Call<ResponseBody> call  = myInterface.getIvoices(new Ivoices(studentid,classid,locationid));
+            Call<ResponseBody> call  = myInterface.getIvoices(new Ivoices(studentid,classid,locationid,Navigation.loginId,Navigation.session));
             call.enqueue(new Callback<ResponseBody>() {
                 @Override
                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
@@ -144,6 +147,22 @@ public class Invoice extends Fragment {
                         {
                             try {
                                 JSONObject object = new JSONObject(bodyString);
+                                String   failure = object.getString("status");
+                                String  errorMessage = object.getString("errorMessage");
+                                if  (failure.contains("failure")) {
+                                    String finalErrorMessage = errorMessage;
+                                    Expired expired = new Expired(getActivity(), finalErrorMessage);
+                                    expired.setTitle(finalErrorMessage);
+                                    expired.setCancelable(false);
+
+                                    expired.setPositiveButton("OK", (dialog1, which) -> {
+                                        expired.getSharedPreferences();
+                                        Intent i = new Intent(getActivity(), PinLogin.class);
+                                        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                        startActivity(i);
+                                    });
+                                    expired.show();
+                                }
                                 JSONArray list = object.getJSONArray("Student Invoice Details");
                                 for(int i=0;i<list.length();i++)
                                 {
@@ -163,9 +182,10 @@ public class Invoice extends Fragment {
                                                 invoiceStatusDisp,paidAmount,paid));
                                         if (paid.contains("N"))
                                         {
-                                            UnPaid.  invoice_arrays.add(new Invoice_array(accountName,bankName,basicAmount,chequePayment,invoiceDtDisp,invoiceHdrName,
+                                            UnPaid.invoice_arrays.add(new Invoice_array(accountName,bankName,basicAmount,chequePayment,invoiceDtDisp,invoiceHdrName,
                                                     invoiceStatusDisp,paidAmount,paid));
-                                            UnPaid.paidadapter = new UnPaid.Paidadapterr(UnPaid. invoice_arrays,getActivity());
+                                            UnPaid.paidadapter = new UnPaid.Paidadapterr(UnPaid. invoice_arrays,
+                                                    getActivity());
 
                                             UnPaid.recyclerView .setAdapter(UnPaid.paidadapter);
 

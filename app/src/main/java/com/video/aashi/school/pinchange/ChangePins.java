@@ -111,7 +111,7 @@ public class ChangePins extends Fragment {
         @Override
         protected Object doInBackground(Object[] objects) {
             Call<ResponseBody> call = loginInterface.changePin(new Pins(Navigation.userid,Navigation.parentPin,
-                    Navigation.parentMob,pin));
+                    Navigation.parentMob,pin,Navigation.loginId,Navigation.session));
             Log.i("Tag","ChangePins"+ Navigation.userid+Navigation.parentPin+
                     Navigation.parentMob+pin);
             call.enqueue(new Callback<ResponseBody>() {

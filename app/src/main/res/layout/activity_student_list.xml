@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/grey"
+    android:orientation="vertical"
+    tools:context=".fragments.studentlist.StudentList">
+
+    <android.support.v7.widget.Toolbar
+        android:background="@color/white"
+        app:title="Students"
+        android:id="@+id/stuTool"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+
+    </android.support.v7.widget.Toolbar>
+
+    <View
+
+        android:background="@color/grey"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"/>
+
+    <GridView
+
+        android:columnWidth="2dp"
+        android:stretchMode="columnWidth"
+        android:numColumns="2"
+        android:id="@+id/studentList"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+
+    </GridView>
+
+</LinearLayout>

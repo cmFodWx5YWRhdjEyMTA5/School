@@ -84,9 +84,17 @@
                    android:textSize="16dp"
                    android:textStyle="bold"
                    android:textColor="@color/white"
-                   android:text="Mohanraj"
+                   android:text=""
                    android:layout_width="match_parent"
                    android:layout_height="wrap_content" />
+                 <TextView
+                     android:layout_width="match_parent"
+                     android:layout_height="wrap_content"
+                     android:textStyle="bold"
+                     android:textColor="@color/white"
+                     android:id="@+id/scholNames"
+                     />
+
                  <LinearLayout
                      android:orientation="horizontal"
                      android:layout_width="match_parent"
@@ -96,7 +104,7 @@
                          android:id="@+id/s_class"
                          android:textSize="16dp"
                          android:textColor="@color/white"
-                         android:text="class 10-B"
+                         android:text=""
                          android:layout_width="wrap_content"
                          android:layout_height="wrap_content" />
 
@@ -112,7 +120,7 @@
                          android:textStyle="bold"
                          android:textSize="16dp"
                          android:textColor="@color/white"
-                         android:text="Curent grade"
+                         android:text=""
                          android:layout_width="match_parent"
                          android:layout_height="wrap_content" />
                  </LinearLayout>
@@ -323,6 +331,7 @@
                    </LinearLayout>
 
                    <LinearLayout
+                       android:id="@+id/myHomeworks"
                        android:weightSum="5"
                        android:padding="2dp"
                        android:layout_weight="0.8"
@@ -335,7 +344,7 @@
                            android:layout_weight="1"
                            android:textColor="@color/black"
                            android:textSize="16dp"
-                           android:text="Home work"
+                           android:text="Homework"
                            android:textStyle="bold"
                            android:layout_width="match_parent"
                            android:layout_height="wrap_content" />
@@ -346,7 +355,7 @@
                            android:textSize="14dp"
                            android:layout_marginTop="5dp"
                            android:textStyle="bold"
-                           android:text="Poems"
+                           android:text=""
                            android:layout_width="match_parent"
                            android:layout_height="wrap_content" />
                        <TextView
@@ -355,10 +364,12 @@
                            android:textSize="14dp"
                            android:layout_marginTop="5dp"
                            android:textStyle="bold"
-                           android:text="3 poems "
+                           android:text=""
                            android:layout_width="match_parent"
                            android:layout_height="wrap_content" />
+
                        <TextView
+                           android:visibility="gone"
                            android:id="@+id/view_homework"
                            android:gravity="end"
                            android:textSize="14dp"
@@ -409,6 +420,7 @@
                        </android.support.v7.widget.CardView>
                    </LinearLayout>
                    <LinearLayout
+                       android:id="@+id/myMemoss"
                        android:weightSum="5"
                        android:padding="2dp"
                        android:layout_weight="0.8"
@@ -420,7 +432,7 @@
                            android:layout_weight="1"
                            android:textColor="@color/black"
                            android:textSize="16dp"
-                           android:text="Memo board"
+                           android:text="Memo Board"
                            android:textStyle="bold"
                            android:layout_width="match_parent"
                            android:layout_height="wrap_content" />
@@ -430,7 +442,7 @@
                            android:textSize="14dp"
                            android:layout_marginTop="5dp"
                            android:textStyle="bold"
-                           android:text="Celebrations"
+                           android:text=""
                            android:layout_width="match_parent"
                            android:layout_height="wrap_content" />
 
@@ -440,10 +452,11 @@
                            android:textSize="14dp"
                            android:layout_marginTop="5dp"
                            android:textStyle="bold"
-                           android:text="Ghandhi jayanthi"
+                           android:text=""
                            android:layout_width="match_parent"
                            android:layout_height="wrap_content" />
                        <TextView
+                           android:visibility="gone"
                            android:id="@+id/view_memo"
                            android:gravity="end"
                            android:textSize="14dp"
@@ -490,6 +503,7 @@
                        </android.support.v7.widget.CardView>
                    </LinearLayout>
                    <LinearLayout
+                       android:id="@+id/myNoticeboard"
                        android:weightSum="5"
                        android:padding="2dp"
                        android:layout_weight="0.8"
@@ -501,7 +515,7 @@
                            android:layout_weight="1"
                            android:textColor="@color/black"
                            android:textSize="16dp"
-                           android:text="Notice board"
+                           android:text="Notice Board"
                            android:textStyle="bold"
                            android:layout_width="match_parent"
                            android:layout_height="wrap_content" />
@@ -511,7 +525,7 @@
                            android:textSize="14dp"
                            android:layout_marginTop="5dp"
                            android:textStyle="bold"
-                           android:text="Holidays"
+                           android:text=""
                            android:layout_width="match_parent"
                            android:layout_height="wrap_content" />
                        <TextView
@@ -520,10 +534,11 @@
                            android:textSize="14dp"
                            android:layout_marginTop="5dp"
                            android:textStyle="bold"
-                           android:text="School will be reopened on next monday"
+                           android:text=""
                            android:layout_width="match_parent"
                            android:layout_height="wrap_content" />
                        <TextView
+                           android:visibility="gone"
                            android:id="@+id/view_notice"
                            android:gravity="end"
                            android:textSize="14dp"
@@ -578,6 +593,7 @@
                    </LinearLayout>
 
                    <LinearLayout
+                       android:id="@+id/myHolodays"
                        android:weightSum="5"
                        android:padding="2dp"
                        android:layout_weight="0.8"
@@ -589,7 +605,7 @@
                            android:layout_weight="1"
                            android:textColor="@color/black"
                            android:textSize="16dp"
-                           android:text="Upcoming holidays"
+                           android:text="Holidays"
                            android:textStyle="bold"
                            android:layout_width="match_parent"
                            android:layout_height="wrap_content" />
@@ -600,7 +616,7 @@
                            android:textSize="14dp"
                            android:layout_marginTop="5dp"
                            android:textStyle="bold"
-                           android:text="Holidays"
+
                            android:layout_width="match_parent"
                            android:layout_height="wrap_content" />
                        <TextView
@@ -609,10 +625,11 @@
                            android:textSize="14dp"
                            android:layout_marginTop="5dp"
                            android:textStyle="bold"
-                           android:text="10-10-2018"
+
                            android:layout_width="match_parent"
                            android:layout_height="wrap_content" />
                        <TextView
+                           android:visibility="gone"
                            android:id="@+id/view_hols"
                            android:gravity="end"
                            android:textSize="14dp"

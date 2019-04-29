@@ -3,6 +3,7 @@ package com.video.aashi.school.fragments;
 
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -24,7 +25,9 @@ import android.widget.Toast;
 import com.video.aashi.school.APIUrl;
 import com.video.aashi.school.MainActivity;
 import com.video.aashi.school.Navigation;
+import com.video.aashi.school.PinLogin;
 import com.video.aashi.school.R;
+import com.video.aashi.school.adapters.Expired;
 import com.video.aashi.school.adapters.Interfaces.MyInterface;
 import com.video.aashi.school.adapters.arrar_adapterd.Holiday_adapter;
 import com.video.aashi.school.adapters.arrar_adapterd.Homeworks;
@@ -99,7 +102,7 @@ public class Homework extends Fragment
 
                             }
                         }).build();
-        retrofit = new Retrofit.Builder().baseUrl(APIUrl.BASE_URL).addConverterFactory
+        retrofit = new Retrofit.Builder().baseUrl(HomePage.url).addConverterFactory
                 (GsonConverterFactory.create())
                 .client(defaulthttpClient)
                 .build();
@@ -167,7 +170,7 @@ public class Homework extends Fragment
 
         @Override
         protected Object doInBackground(Object[] objects) {
-            Call<ResponseBody> call = myInterfacee.getWorks(new Howork(classid,studentid,locid,viewmore));
+            Call<ResponseBody> call = myInterfacee.getWorks(new Howork(classid,studentid,locid,viewmore,Navigation.loginId,Navigation.session));
 
 
             call.enqueue(new Callback<ResponseBody>() {
@@ -191,6 +194,22 @@ public class Homework extends Fragment
                         {
                             try {
                                 JSONObject object = new JSONObject(bodyString);
+                                String   failure = object.getString("status");
+                                String  errorMessage = object.getString("errorMessage");
+                                if  (failure.contains("failure")) {
+                                    String finalErrorMessage = errorMessage;
+                                    Expired expired = new Expired(getActivity(), finalErrorMessage);
+                                    expired.setTitle(finalErrorMessage);
+                                    expired.setCancelable(false);
+
+                                    expired.setPositiveButton("OK", (dialog1, which) -> {
+                                        expired.getSharedPreferences();
+                                        Intent i = new Intent(getActivity(), PinLogin.class);
+                                        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                        startActivity(i);
+                                    });
+                                    expired.show();
+                                }
                                 JSONArray list = object.getJSONArray("Home Work Details");
                                 if (list.length() != 0)
                                 {
@@ -210,8 +229,6 @@ public class Homework extends Fragment
                                         homeworks.add(new Homeworks(date1,date2,description,chapter,subject));
                                         homeWorkAdapter = new HomeWorkAdapter(homeworks);
                                         recyclerView.setAdapter(homeWorkAdapter);
-
-//                                        homeWorkAdapter.notifyDataSetChanged();
                                         progressDialog.dismiss();
 
                                     }

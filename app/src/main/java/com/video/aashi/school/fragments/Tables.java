@@ -4,6 +4,7 @@ package com.video.aashi.school.fragments;
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -23,8 +24,11 @@ import android.widget.Toast;
 
 import com.video.aashi.school.APIUrl;
 import com.video.aashi.school.MainActivity;
+import com.video.aashi.school.Navigation;
 import com.video.aashi.school.Performance;
+import com.video.aashi.school.PinLogin;
 import com.video.aashi.school.R;
+import com.video.aashi.school.adapters.Expired;
 import com.video.aashi.school.adapters.Interfaces.MyInterface;
 import com.video.aashi.school.adapters.arrar_adapterd.MarksArray;
 import com.video.aashi.school.adapters.post_class.Marks;
@@ -93,7 +97,7 @@ public class Tables extends Fragment {
 
                             }
                         }).build();
-        retrofit =   new Retrofit.Builder().baseUrl(APIUrl.BASE_URL).addConverterFactory
+        retrofit =   new Retrofit.Builder().baseUrl(HomePage.url).addConverterFactory
                 (GsonConverterFactory.create())
                 .client(defaulthttpClient)
                 .build();
@@ -128,7 +132,7 @@ public class Tables extends Fragment {
         @Override
         protected Object doInBackground(Object[] objects) {
             Call<ResponseBody> call = myInterface.getMarks(new Marks(Charts.examGroupId,Charts. locId,Charts. classId,
-                   Charts. studentId,Charts. accademicYearId));
+                   Charts. studentId,Charts. accademicYearId,Navigation.loginId,Navigation.session));
             call.enqueue(new Callback<ResponseBody>() {
                 @Override
                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
@@ -150,6 +154,22 @@ public class Tables extends Fragment {
                             try {
 
                                 JSONObject object = new JSONObject(bodyString);
+                                String   failure = object.getString("status");
+                                String  errorMessage = object.getString("errorMessage");
+                                if  (failure.contains("failure")) {
+                                    String finalErrorMessage = errorMessage;
+                                    Expired expired = new Expired(getActivity(), finalErrorMessage);
+                                    expired.setTitle(finalErrorMessage);
+                                    expired.setCancelable(false);
+
+                                    expired.setPositiveButton("OK", (dialog1, which) -> {
+                                        expired.getSharedPreferences();
+                                        Intent i = new Intent(getActivity(), PinLogin.class);
+                                        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                        startActivity(i);
+                                    });
+                                    expired.show();
+                                }
                                 JSONArray list = object.getJSONArray("Student Performance Chart Data");
                                 for (int i = 0; i < list.length(); i++) {
 

@@ -42,9 +42,6 @@ public class Performance extends Fragment {
         tabLayout.setupWithViewPager(viewPager);
         tabLayout.setTabTextColors(ColorStateList.valueOf(Color.parseColor("#20A4E8")));
         Bundle bundle = getArguments();
-
-
-
         if (bundle != null)
         {
             groupname =bundle.getString("examtype");

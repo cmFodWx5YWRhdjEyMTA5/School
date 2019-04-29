@@ -4,6 +4,7 @@ package com.video.aashi.school.fragments;
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
@@ -38,8 +39,10 @@ import com.prolificinteractive.materialcalendarview.OnMonthChangedListener;
 import com.video.aashi.school.APIUrl;
 import com.video.aashi.school.MainActivity;
 import com.video.aashi.school.Navigation;
+import com.video.aashi.school.PinLogin;
 import com.video.aashi.school.R;
 import com.video.aashi.school.adapters.ApiClient;
+import com.video.aashi.school.adapters.Expired;
 import com.video.aashi.school.adapters.Interfaces.DatabaseHelper;
 import com.video.aashi.school.adapters.Interfaces.MyInterface;
 import com.video.aashi.school.adapters.arrar_adapterd.Name;
@@ -188,9 +191,13 @@ public class Attendace extends Fragment implements OnDateSelectedListener {
         materialCalendarView = (MaterialCalendarView) view.findViewById(R.id.mycalender);
         materialCalendarView.state().edit().setCalendarDisplayMode(CalendarMode.MONTHS).commit();
         materialCalendarView.setTileWidth(LinearLayout.LayoutParams.MATCH_PARENT);
-        materialCalendarView.setSelectionMode(MaterialCalendarView.SELECTION_MODE_MULTIPLE);
+
         progressDialog = new ProgressDialog(getActivity());
         materialCalendarView.addDecorator(new HighlightWeekendsDecorator(getActivity()));
+
+        materialCalendarView.setSelectionColor(Color.TRANSPARENT);
+
+
         myswitch =(Switch)view.findViewById(R.id.simpleSwitch);
         mytext =(TextView)view.findViewById(R.id.switches);
         db = new DatabaseHelper(getActivity());
@@ -211,6 +218,7 @@ public class Attendace extends Fragment implements OnDateSelectedListener {
                 final Calendar currentCal=Calendar.getInstance();
                 month  = Month.of(currentCal.get(Calendar.MONTH)+ 1);
                 loadDatas(month.toString());
+                getExtras(month.toString());
                 Log.i("Tag","getAttandances" + month);
                 progressDialog.show();
             }
@@ -243,7 +251,7 @@ public class Attendace extends Fragment implements OnDateSelectedListener {
                     }
                 })
                 .build();
-        retrofit =   new Retrofit.Builder().baseUrl(APIUrl.BASE_URL).addConverterFactory
+        retrofit =   new Retrofit.Builder().baseUrl(HomePage.url).addConverterFactory
                 (GsonConverterFactory.create())
                 .client(httpClient)
                 .build();
@@ -338,7 +346,7 @@ public class Attendace extends Fragment implements OnDateSelectedListener {
     }
     void getExtras(String months)
     {
-        retrofit2.Call<ResponseBody> responseBodyCall = myInterface.getAttendance(new Attend(aca_year,s_yesr,loc_id));
+        retrofit2.Call<ResponseBody> responseBodyCall = myInterface.getAttendance(new Attend(aca_year,s_yesr,loc_id,Navigation.loginId,Navigation.session));
         responseBodyCall.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(retrofit2.Call<ResponseBody> call, Response<ResponseBody> response) {
@@ -347,6 +355,22 @@ public class Attendace extends Fragment implements OnDateSelectedListener {
                     bodyString = response.body().string();
                     try {
                         JSONObject object = new JSONObject(bodyString);
+                        String   failure = object.getString("status");
+                        String  errorMessage = object.getString("errorMessage");
+                        if  (failure.contains("failure")) {
+                            String finalErrorMessage = errorMessage;
+                            Expired expired = new Expired(getActivity(), finalErrorMessage);
+                            expired.setTitle(finalErrorMessage);
+                            expired.setCancelable(false);
+
+                            expired.setPositiveButton("OK", (dialog1, which) -> {
+                                expired.getSharedPreferences();
+                                Intent i = new Intent(getActivity(), PinLogin.class);
+                                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                startActivity(i);
+                            });
+                            expired.show();
+                        }
                         JSONArray list = object.getJSONArray("Student Attendance Details");
                         if (list.length() == 0) {
                             Toast.makeText(getActivity(), "No attendance found", Toast.LENGTH_LONG).show();
@@ -395,7 +419,7 @@ public class Attendace extends Fragment implements OnDateSelectedListener {
     void loadDatas(String months)
     {
         progressDialog.show();
-        retrofit2.Call<ResponseBody> responseBodyCall = myInterface.getAttendance(new Attend(aca_year,s_yesr,loc_id));
+        retrofit2.Call<ResponseBody> responseBodyCall = myInterface.getAttendance(new Attend(aca_year,s_yesr,loc_id,Navigation.loginId,Navigation.session));
         responseBodyCall.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(retrofit2.Call<ResponseBody> call, Response<ResponseBody> response)

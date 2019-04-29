@@ -3,6 +3,7 @@ package com.video.aashi.school.fragments;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -26,7 +27,9 @@ import android.widget.Toast;
 import com.video.aashi.school.APIUrl;
 import com.video.aashi.school.MainActivity;
 import com.video.aashi.school.Navigation;
+import com.video.aashi.school.PinLogin;
 import com.video.aashi.school.R;
+import com.video.aashi.school.adapters.Expired;
 import com.video.aashi.school.adapters.Interfaces.MyInterface;
 import com.video.aashi.school.adapters.arrar_adapterd.MyMemos;
 import com.video.aashi.school.adapters.post_class.Memo;
@@ -133,7 +136,7 @@ public class Memos extends Fragment {
 
                             }
                         }).build();
-        retrofit =   new Retrofit.Builder().baseUrl(APIUrl.BASE_URL).addConverterFactory
+        retrofit =   new Retrofit.Builder().baseUrl(HomePage.url).addConverterFactory
                 (GsonConverterFactory.create())
                 .client(defaulthttpClient)
                 .build();
@@ -195,7 +198,7 @@ public class Memos extends Fragment {
         }
              @Override
         protected Object doInBackground(Object[] objects) {
-            Call<ResponseBody> call = myInterface.getMemos(new Memo(classId,studentId,locId,classGeneralId));
+            Call<ResponseBody> call = myInterface.getMemos(new Memo(classId,studentId,locId,classGeneralId,Navigation.loginId,Navigation.session));
             call.enqueue(new Callback<ResponseBody>() {
                 @Override
                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
@@ -216,6 +219,22 @@ public class Memos extends Fragment {
                         Log.e("Tag", "MyMemos"+ bodyString);
                         try {
                             JSONObject object = new JSONObject(bodyString);
+                            String   failure = object.getString("status");
+                            String  errorMessage = object.getString("errorMessage");
+                            if  (failure.contains("failure")) {
+                                String finalErrorMessage = errorMessage;
+                                Expired expired = new Expired(getActivity(), finalErrorMessage);
+                                expired.setTitle(finalErrorMessage);
+                                expired.setCancelable(false);
+
+                                expired.setPositiveButton("OK", (dialog1, which) -> {
+                                    expired.getSharedPreferences();
+                                    Intent i = new Intent(getActivity(), PinLogin.class);
+                                    i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                    startActivity(i);
+                                });
+                                expired.show();
+                            }
                             JSONArray list = object.getJSONArray("Memo Board Details");
                             if (list.length() != 0)
                             {

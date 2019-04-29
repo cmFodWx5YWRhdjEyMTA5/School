@@ -8,8 +8,11 @@ public class Home {
          String  classGeneralId;
           String viewMore;
           String academicYearId;
+    String parentLoginCode;
+    String mobSession;
 
-          public  Home(String classId,String studentId,String locId,String classGeneralId,String viewMore,String academicYearId)
+          public  Home(String classId,String studentId,String locId,String classGeneralId,String viewMore,
+                       String academicYearId,String parentLoginCode,String mobSession)
           {
 
               this.classId = classId;
@@ -18,6 +21,8 @@ public class Home {
               this.classGeneralId = classGeneralId;
               this.viewMore = viewMore;
               this.academicYearId = academicYearId;
+              this.parentLoginCode = parentLoginCode;
+              this.mobSession = mobSession;
           }
 
 

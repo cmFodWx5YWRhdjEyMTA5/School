@@ -3,6 +3,7 @@ package com.video.aashi.school.fragments;
 
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -22,7 +23,9 @@ import android.widget.Toast;
 import com.video.aashi.school.APIUrl;
 import com.video.aashi.school.MainActivity;
 import com.video.aashi.school.Navigation;
+import com.video.aashi.school.PinLogin;
 import com.video.aashi.school.R;
+import com.video.aashi.school.adapters.Expired;
 import com.video.aashi.school.adapters.Interfaces.MyInterface;
 import com.video.aashi.school.adapters.arrar_adapterd.Exams;
 import com.video.aashi.school.adapters.arrar_adapterd.Holiday_adapter;
@@ -106,7 +109,7 @@ public class ExamTables extends Fragment {
 
                             }
                         }).build();
-        retrofit = new Retrofit.Builder().baseUrl(APIUrl.BASE_URL).addConverterFactory
+        retrofit = new Retrofit.Builder().baseUrl(HomePage.url).addConverterFactory
                 (GsonConverterFactory.create())
                 .client(defaulthttpClient)
                 .build();
@@ -158,7 +161,7 @@ class getExams extends AsyncTask
     protected Object doInBackground(Object[] objects) {
 
         examsList = new ArrayList<>();
-        Call<ResponseBody> call = myInterface.getExams(new ExamTime(groupid,locid,classid,studentd,acaid));
+        Call<ResponseBody> call = myInterface.getExams(new ExamTime(groupid,locid,classid,studentd,acaid,Navigation.loginId,Navigation.session));
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
@@ -174,15 +177,30 @@ class getExams extends AsyncTask
                         bodyString = response.body().string();
 
 
-
+                        Log.i("Tag", "MyExams" + bodyString);
                         try {
                             JSONObject object = new JSONObject(bodyString);
+                            String   failure = object.getString("status");
+                            String  errorMessage = object.getString("errorMessage");
+                            if  (failure.contains("failure")) {
+                                String finalErrorMessage = errorMessage;
+                                Expired expired = new Expired(getActivity(), finalErrorMessage);
+                                expired.setTitle(finalErrorMessage);
+                                expired.setCancelable(false);
 
+                                expired.setPositiveButton("OK", (dialog1, which) -> {
+                                    expired.getSharedPreferences();
+                                    Intent i = new Intent(getActivity(), PinLogin.class);
+                                    i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                    startActivity(i);
+                                });
+                                expired.show();
+                            }
                             JSONArray list = object.getJSONArray("Student Exam TimeTable Details");
                             for (int i = 0; i < list.length(); i++)
                             {
                                 JSONObject data = list.getJSONObject(i);
-                                Log.i("Tag", "MyExams" + bodyString);
+
                                 if(data.length() != 0) {
                                     String subject, date, time, amorpm;
                                     date = data.getString("examDtDisp");

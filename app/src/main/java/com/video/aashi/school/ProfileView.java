@@ -23,17 +23,23 @@ import android.widget.Toolbar;
 import com.squareup.picasso.Picasso;
 import com.video.aashi.school.adapters.Interfaces.CircleTransform;
 import com.video.aashi.school.adapters.Interfaces.MyInterface;
+import com.video.aashi.school.adapters.arrar_adapterd.Students;
 import com.video.aashi.school.adapters.post_class.Login;
 import com.video.aashi.school.fragments.HomePage;
+import com.video.aashi.school.fragments.studentlist.StudentList;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Objects;
 
 import okhttp3.Call;
+import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
 import okhttp3.ResponseBody;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Callback;
@@ -47,16 +53,18 @@ public class ProfileView extends Fragment {
 
     Retrofit retrofit;
     ImageView profileimg;
+    MyInterface loginInterfaces;
     MyInterface loginInterface;
     HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
-  SharedPreferences sharedPreferences;
-  String username,password;
+  SharedPreferences sharedPreferences,sharedPreferencess,myPref;
+  String username,password,sessions;
+  int positions;
 
   String s_name,s_class,academicyear,city,gendre,middlename,lastnmame,fathersnme,dob,mobleno,pincode,state,
           fatherEmailId,studentNationality,motherName,age;
 
   String registration,joineddate,joinedyear,rollno;
-
+    ArrayList<Students> students;
 
    TextView tusername,tClass,tAcademic,tCity,tCitys,tState,tPincode,tMiddle,tLast,tMother,tFather,tFirst,tMobile,tGendre;
    TextView   registation,joinedyears,joineddates ,ages,dobs,rollnumber,bloodgroup;
@@ -67,6 +75,7 @@ public class ProfileView extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.activity_profile_view, container, false);
         toolbar=(android.support.v7.widget.Toolbar)getActivity(). findViewById(R.id.toolbar);
+        students = new ArrayList<>();
         tFirst =(TextView)view. findViewById(R.id.firstname);
         tusername =(TextView)view.findViewById(R.id.usernames);
         tClass =(TextView)view.findViewById(R.id.classid);
@@ -89,25 +98,75 @@ public class ProfileView extends Fragment {
         joinedyears=(TextView)view.findViewById(R.id.joined);
         registation=(TextView)view.findViewById(R.id.registration);
         profileimg =(ImageView)view.findViewById(R.id.profileImg);
-    //    Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+        sharedPreferencess = getActivity().getSharedPreferences(StudentList.PREF_NAME, MODE_PRIVATE);
+
+        //Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+        myPref = getActivity().getSharedPreferences("pinValidate",MODE_PRIVATE);
         sharedPreferences =getActivity(). getSharedPreferences("mylogin",MODE_PRIVATE);
-        username = Navigation.loginId;
-        password = Navigation.parentPin;
+        username = myPref.getString("loginId","");
+        password = myPref.getString("parentPin","") ;
+        sessions = myPref.getString("Sessions","");
+        positions = sharedPreferencess.getInt("student",0);
         toolbar.setTitle("Profile");
         logging.setLevel(HttpLoggingInterceptor.Level.BODY);
         OkHttpClient client = new OkHttpClient.Builder().addInterceptor(logging).build();
 
-        retrofit =   new Retrofit.Builder().baseUrl(APIUrl.BASE_URL).addConverterFactory
+        retrofit =   new Retrofit.Builder().baseUrl(HomePage.url).addConverterFactory
                 (GsonConverterFactory.create())
                 .client(client)
                 .build();
+
+
+        s_name = sharedPreferencess.getString("studentFirstName","");
+        s_class = sharedPreferencess.getString("currentClassCd","");
+        middlename = sharedPreferencess.getString("studentMiddleName","");
+        lastnmame = sharedPreferencess.getString("studentLastName","");
+        city = sharedPreferencess.getString("studentPlace","");
+        state = sharedPreferencess.getString("state","");
+        pincode = sharedPreferencess.getString("pincode","");
+        mobleno = sharedPreferencess.getString("mobileNo","");
+        motherName = sharedPreferencess.getString("motherName","");
+        academicyear = sharedPreferencess.getString("currentAcademicYr","");
+        gendre = sharedPreferencess.getString("genderDisp","");
+        studentNationality =  sharedPreferencess.getString("studentNationality","");
+        fatherEmailId = sharedPreferencess.getString("fatherEmailId","");
+        fathersnme = sharedPreferencess.getString("fatherName","");
+        age = sharedPreferencess.getString("studentAge","");
+        registration = sharedPreferencess.getString("registrationNo","");
+        joineddate = sharedPreferencess.getString("joiningDtDisp","");
+        joinedyear = sharedPreferencess.getString("joiningAcademicYr","");
+        dob = sharedPreferencess.getString("studentDobDisp","");
+        rollno = sharedPreferencess.getString("rollNo","");
+        String bloodgroups = sharedPreferencess.getString("studentBloodGroup","");
+        Log.i("Tag", "MyProfiles"+ s_name+motherName+lastnmame+middlename+city);
+        tusername.setText(s_name);
+        tClass.setText("( " + s_class+" )");
+        tAcademic.setText(academicyear);
+        tCitys.setText(city);
+        tCity.setText(city);
+        tState.setText(state + " -");
+        tPincode.setText( pincode);
+        tMiddle.setText(middlename);
+        tLast.setText(lastnmame);
+        tMother.setText(motherName);
+        tFather.setText(fathersnme);
+        tGendre.setText(gendre);
+        tMobile.setText(mobleno);
+        tFirst.setText(s_name);
+        joineddates.setText(joineddate);
+        joinedyears.setText(joinedyear);
+        registation.setText(registration);
+        ages.setText(age+" Yrs");
+        dobs.setText(dob);
+        rollnumber.setText(rollno);
+        bloodgroup.setText(bloodgroups);
         Picasso.get()
-                .load(APIUrl.IMAGE_URl+ HomePage.image)
+                .load(HomePage.urls+ HomePage.image)
                 .error(R.drawable.badge )
                 .into(profileimg);
         loginInterface = retrofit.create(MyInterface.class);
-            Log.i("Tag","Mylogin"+username+password);
-        new LoadProfile().execute();
+           // Log.i("Tag","Mylogin"+username+password);
+//         new LoadProfile().execute();
         return view ;
     }
     @Override
@@ -132,7 +191,7 @@ public class ProfileView extends Fragment {
         @Override
         protected Object doInBackground(Object[] objects) {
 
-            retrofit2.Call<ResponseBody> call = loginInterface.getLogin(new Login(Navigation.loginId,Navigation.parentPin));
+            retrofit2.Call<ResponseBody> call = loginInterface.getLogin(new Login(username,password));
             call.enqueue(new Callback<ResponseBody>() {
                 @SuppressLint("SetTextI18n")
                 @Override
@@ -150,6 +209,18 @@ public class ProfileView extends Fragment {
 
                             JSONObject object = new JSONObject(bodyString);
                             JSONObject jsonObject = object.getJSONObject("Student Data");
+                            String isMultipleStudent = jsonObject.getString("isMultipleStudent");
+
+                            if (isMultipleStudent.contains("Y"))
+                            {
+                                new LoadStudent().execute();
+                                progressDialog.dismiss();
+
+                            }
+                            else
+                            {
+
+
                             s_name = jsonObject.getString("studentFirstName");
                             s_class = jsonObject.getString("currentClassCd");
                             middlename = jsonObject.getString("studentMiddleName");
@@ -195,6 +266,8 @@ public class ProfileView extends Fragment {
                             bloodgroup.setText(bloodgroups);
                             progressDialog.dismiss();
                         }
+
+                        }
                         catch (JSONException e)
 
                         {
@@ -209,10 +282,84 @@ public class ProfileView extends Fragment {
 
                         progressDialog.dismiss();
                     }
+                }
+                @Override
+                public void onFailure(retrofit2.Call<ResponseBody> call, Throwable t) {
+
+                }
+            });
+            return null;
+        }
+    }
+
+    class LoadStudent extends AsyncTask
+    {
+
+        MyInterface myInterface;
+        @Override
+        protected void onPreExecute() {
+
+            Retrofit retrofit1;
+
+            OkHttpClient defaulthttpClient = new OkHttpClient.Builder()
+                    .addInterceptor(
+                            new Interceptor() {
+                                @Override
+                                public okhttp3.Response intercept(Chain chain) throws IOException {
+                                    Request request = chain.request().newBuilder()
+                                            .addHeader("Content-Type", "application/json").build();
+                                    return chain.proceed(request);
+                                }
+                            }).build();
+
+            retrofit1 = new Retrofit.Builder().baseUrl(HomePage.url).addConverterFactory
+                    (GsonConverterFactory.create())
+                    .client(defaulthttpClient)
+                    .build();
+            myInterface = retrofit1.create(MyInterface.class);
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Object doInBackground(Object[] objects) {
+            retrofit2.Call<ResponseBody> call =
+                    myInterface.getStudentList(new com.video.aashi.school.adapters.post_class.StudentList(
+                    username,password,sessions));
 
 
+            call.enqueue(new Callback<ResponseBody>() {
+                @SuppressLint("SetTextI18n")
+                @Override
+                public void onResponse(retrofit2.Call<ResponseBody> call, Response<ResponseBody> response) {
+                    Log.i("Tag","Mylogin "+ Navigation.session +  "Session 2 :" + sessions  );
+                    if (response.isSuccessful()) {
+                        try {
+                            String bodyString = null;
+                            bodyString = response.body().string();
+                            Log.i("Tag","MyStudentListss"+bodyString);
+                            JSONObject object = new JSONObject(bodyString);
+                            JSONArray list = object.getJSONArray("Student List");
+                            for (int i = 0;i<list.length();i++)
+                            {
+                                if (list.length() ==0)
+                                {
+
+                                }
+                                else
+                                {
 
 
+                                }
+                            }
+                        }
+                        catch (IOException  | JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    else
+                    {
+                        Toast.makeText(getActivity(),"Something went wrong..!",Toast.LENGTH_SHORT).show();
+                    }
                 }
 
                 @Override

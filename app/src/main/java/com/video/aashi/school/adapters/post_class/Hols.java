@@ -4,11 +4,15 @@ public class Hols {
     String academicYearId;
     String classGeneralId;
     String locId;
+    String parentLoginCode;
+    String mobSession;
 
-    public Hols(String academicYearId,String classGeneralId,String locId)
+    public Hols(String academicYearId,String classGeneralId,String locId,String parentLoginCode,String mobSession)
     {
         this.academicYearId = academicYearId;
         this.classGeneralId = classGeneralId;
         this.locId = locId;
+        this.parentLoginCode = parentLoginCode;
+        this.mobSession = mobSession;
     }
 }

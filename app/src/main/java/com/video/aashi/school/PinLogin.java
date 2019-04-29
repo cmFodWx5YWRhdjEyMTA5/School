@@ -16,6 +16,8 @@ import android.widget.Toast;
 import com.video.aashi.school.adapters.Interfaces.MyInterface;
 import com.video.aashi.school.adapters.post_class.Combo;
 import com.video.aashi.school.adapters.post_class.PinVal;
+import com.video.aashi.school.fragments.Settings;
+import com.video.aashi.school.fragments.studentlist.StudentList;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -49,6 +51,7 @@ public class PinLogin extends AppCompatActivity {
     SharedPreferences sharedPreferencess;
     SharedPreferences.Editor editor2;
     public static final String PREF_NAME = "loginstatus";
+    public  static  String validationUrl;
     HttpLoggingInterceptor loggings = new HttpLoggingInterceptor();
     @SuppressLint("CommitPrefEdits")
     @Override
@@ -74,22 +77,45 @@ public class PinLogin extends AppCompatActivity {
         // Log.i("Tag","PinValidate"+  silent);
         loginInterface = retrofit.create(MyInterface.class);
         if (getSharedPreferences(NAME_PREF,0).getBoolean("isLogin",false)) {
-            if (silent)
+            if (getSharedPreferences("MySession",0).getBoolean("isLogins",false))
             {
-                Intent i = new Intent(PinLogin.this, Navigation.class);
-                i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                Intent i = new Intent(PinLogin.this, LoginAttempt.class);
+                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(i);
+
             }
             else
             {
-                Log.i("Tag","PinValidate"+silent);
-                Intent intent= new Intent(PinLogin.this,Login.class);
-                intent.putExtra("loginKey","0");
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                startActivity(intent);
-                finish();
+                if (silent)
+                {
+                    if (getSharedPreferences(NAME_PREF,0).getBoolean("MyStudents",true))
+                    {
+                        Intent i = new Intent(PinLogin.this, StudentList.class);
+                        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(i);
+                    }
+                    else
+                    {
 
+                        Intent i = new Intent(PinLogin.this, Navigation.class);
+                        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(i);
+                    }
+
+
+                }
+                else
+                {
+                    Log.i("Tag","PinValidate"+silent);
+                    Intent intent= new Intent(PinLogin.this,LoginAttempt.class);
+                    intent.putExtra("loginKey","0");
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                    finish();
+                }
             }
+
+
         }
         validate.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -98,11 +124,6 @@ public class PinLogin extends AppCompatActivity {
                 {
                     userId.setError("Please enter userId");
                     userId.requestFocus();
-                }
-                else if (userPin.getText().toString().isEmpty())
-                {
-                    userPin.setError("Please enter pin");
-                    userPin.requestFocus();
                 }
                 else if (userMobile.getText().toString().isEmpty())
                 {
@@ -134,7 +155,7 @@ public class PinLogin extends AppCompatActivity {
             u_pin = userPin.getText().toString();
             mobile = userMobile.getText().toString();
             u_id =  userId.getText().toString();
-            Call<ResponseBody> call = loginInterface.getPin(new PinVal(u_id,u_pin,mobile));
+            Call<ResponseBody> call = loginInterface.getPin(new PinVal(u_id,mobile));
             call.enqueue(new Callback<ResponseBody>() {
                 @Override
                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
@@ -144,7 +165,7 @@ public class PinLogin extends AppCompatActivity {
                         bodyString  = response.body().string();
                         JSONObject object = new JSONObject(bodyString);
 
-                        String validationUrl,organizationName,parentLoginId,parentName,errorMessage,
+                        String organizationName,parentLoginId,parentName,errorMessage,
                                 studentName,parentPin,parentMobile,userId;
                         errorMessage = object.getString("errorMessage");
                         if (errorMessage.equals("null"))
@@ -157,15 +178,15 @@ public class PinLogin extends AppCompatActivity {
                             parentPin = object.getString("parentPin");
                             parentMobile = object.getString("parentMobile");
                             userId =object.getString("appUserId");
-                            editor.putBoolean("isLogin",true);
+
                             editor.putString("loginId",parentLoginId);
                             editor.putString("url",validationUrl);
                             editor.putString("oName",organizationName);
                             editor.putString("parentName",parentName);
                             editor.putString("stuName",studentName);
-                            editor.putString("parentPin",parentPin);
                             editor.putString("mobiles",parentMobile);
                             editor.putString("userId",userId);
+                            editor.putBoolean("MyStudents",false);
                             editor.apply();
                             SharedPreferences settings =getSharedPreferences("com.example.xyz", 0);
                             SharedPreferences.Editor editor = settings.edit();
@@ -175,36 +196,34 @@ public class PinLogin extends AppCompatActivity {
                             @SuppressLint("CommitPrefEdits") SharedPreferences.Editor editors = changetert.edit();
                             editors.putString("mytext","Remove Pin");
                             editors.apply();
-                            editor.commit();
+                            editor.apply();
                             loginId = parentLoginId;
                             passwords =parentPin;
                             loggings.setLevel(HttpLoggingInterceptor.Level.BODY);
                             clients = new OkHttpClient.Builder().addInterceptor(logging).build();
-                            retrofits =   new Retrofit.Builder().baseUrl(validationUrl +"rest/ParentLoginRestWS/").addConverterFactory
+                            retrofits =   new Retrofit.Builder().baseUrl(validationUrl +"rest/ParentLoginRestWS/").
+                                    addConverterFactory
                                     (GsonConverterFactory.create())
                                     .client(clients)
                                     .build();
                             loginInterfaces = retrofits.create(MyInterface.class);
-                            new LoginTask().execute();
+                         //   new LoginTask().execute();
                            // progressDialog.dismiss();
-                           // Intent i=new Intent(PinLogin.this,Login.class);
-                         //   i.putExtra("loginKey","0");
-                           // i.putExtra("myPin",parentPin);
-                           // i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            //startActivity(i);
+                             Intent i=new Intent(PinLogin.this,LoginAttempt.class);
+                             i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                             startActivity(i);
                         }
                         else
                         {
                             Toast.makeText(getApplicationContext(),errorMessage,Toast.LENGTH_SHORT).show();
-                           // progressDialog.dismiss();
+                            progressDialog.dismiss();
                         }
                     }
                     catch (IOException | JSONException e)
                     {
                         e.printStackTrace();
                     }
-
-            }
+                 }
 
                 @Override
                 public void onFailure(Call<ResponseBody> call, Throwable t) {
@@ -215,114 +234,5 @@ public class PinLogin extends AppCompatActivity {
             return null;
         }
     }
-    public class  LoginTask extends AsyncTask<Void,Void,Void>
-    {
 
-        @Override
-        protected void onPreExecute()
-        {
-            super.onPreExecute();
-        }
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            progressDialog.dismiss();
-            super.onPostExecute(aVoid);
-        }
-        @Override
-        protected Void doInBackground(Void... voids) {
-            //  usernames = username1.getText().toString();
-
-
-         //   Log.i("Tag","LogCredit"+passwords);
-            SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences("mylogin", MODE_PRIVATE);
-            @SuppressLint("CommitPrefEdits") final SharedPreferences.Editor editor1 = sharedPreferences.edit();
-
-            editor1.apply();
-            Call<ResponseBody> call = loginInterfaces.getLogin
-                    (new com.video.aashi.school.adapters.post_class.Login(loginId,passwords));
-            call.enqueue(new Callback<ResponseBody>()
-            {
-                @Override
-                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-               //     Log.d("Tag", "Mybody"+ call.request().url() + loginId + passwords)  ;
-                    String bodyString = null;
-                    try {
-                        bodyString  = response.body().string();
-                        if(!bodyString.equals("{}") )
-                        {
-                            String  sstudentId,name,locationid,genid,classid,studentpic,acyearid,examid,classname,mobile;
-                            String studentPhotoPath,passwor,users,fatherEmailId;
-                            try
-                            {
-                                JSONObject object=new JSONObject(bodyString);
-                                JSONObject jsonObject = object.getJSONObject("Student Data");
-                                sstudentId = jsonObject.getString("studentId");
-                                name = jsonObject.getString("studentFirstName");
-                                locationid = jsonObject.getString("locationId");
-                                genid = jsonObject.getString("currentClassGenId");
-                                classid = jsonObject.getString("currentClassId");
-                                studentpic = jsonObject.getString("studentPhotoPath");
-                                acyearid = jsonObject.getString("currentAcademicYrId");
-                                examid = jsonObject.getString("examTermGroupId");
-                                classname =  jsonObject.getString("currentClassCd");
-                                mobile = jsonObject.getString("mobileNo");
-                                studentPhotoPath = jsonObject.getString("studentPhotoPath");
-                                passwor = jsonObject.getString("parentPasswordDisp");
-                                users = jsonObject.getString("studParentCode");
-                                fatherEmailId = jsonObject.getString("fatherEmailId");
-                                Log.i("Tag","LoginId"+acyearid);
-                                editor2.putString("StudentId",sstudentId);
-                                editor2.putString("S_name",name);
-                                editor2.putString("location_id",locationid);
-                                editor2.putString("gen_id",genid);
-                                editor2.putString("class_id",classid);
-                                editor2.putString("image",studentpic);
-                                editor2.putString("academic",acyearid);
-                                editor2.putBoolean("isLoginKey",true);
-                                editor2.putString("examid",examid);
-                                editor2.putString("classname",classname);
-                                editor2.putString("mobile",mobile);
-                                editor2.putString("photo",studentPhotoPath);
-                                editor2.putString("fathers",fatherEmailId);
-                                editor2.commit();
-                                Intent i=new Intent(PinLogin.this,Navigation.class);
-                                SharedPreferences settings =getSharedPreferences("com.example.xyz", 0);
-                                SharedPreferences.Editor editor = settings.edit();
-                                editor.putString("myPin",passwords);
-                                editor.apply();
-                                Toast.makeText(getApplicationContext(), "Thank You!", Toast.LENGTH_SHORT).show();
-                                i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                startActivity(i);
-                                finish();
-                            }
-                            catch (Exception e)
-                            {
-                                e.printStackTrace();
-                            }
-                        }
-                        else
-                        {
-                              progressDialog.dismiss();
-                              Toast.makeText(getApplicationContext(),"Enter valid pin..!!!",Toast.LENGTH_LONG).show();
-                        }
-                    }
-                    catch (IOException e) {
-                        e.printStackTrace();
-
-                    }
-
-                    ResponseBody responseBody =  response.body();
-                  //  Log.i("Tag","Respose" + call.request().url());
-                    assert bodyString != null;
-
-                }
-                @Override
-                public void onFailure(Call<ResponseBody> call, Throwable t) {
-
-
-                }
-            });
-            return null;
-        }
-    }
 }

@@ -1,6 +1,7 @@
 package com.video.aashi.school.adapters;
 
 import com.video.aashi.school.APIUrl;
+import com.video.aashi.school.fragments.HomePage;
 
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -20,7 +21,7 @@ public class ApiClient {
         public static Retrofit getApiCLient() {
 
             if (retrofit == null) {
-                retrofit = new Retrofit.Builder().baseUrl(APIUrl.BASE_URL).addConverterFactory
+                retrofit = new Retrofit.Builder().baseUrl(HomePage.url).addConverterFactory
                         (GsonConverterFactory.create())
                         .build();
             }

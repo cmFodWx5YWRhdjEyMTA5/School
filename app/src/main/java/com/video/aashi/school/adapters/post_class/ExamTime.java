@@ -6,9 +6,10 @@ String locId;
 String classId;
 String studentId;
 String accademicYearId;
+    String parentLoginCode;
+    String mobSession;
 
-
-public  ExamTime(String examGroupId,String locId,String classId,String studentId,String accademicYearId)
+public  ExamTime(String examGroupId,String locId,String classId,String studentId,String accademicYearId,String parentLoginCode,String mobSession)
 {
 
     this.examGroupId = examGroupId;
@@ -16,7 +17,8 @@ public  ExamTime(String examGroupId,String locId,String classId,String studentId
     this.classId =  classId;
     this.studentId = studentId;
     this.accademicYearId = accademicYearId;
-
+    this.parentLoginCode = parentLoginCode;
+    this.mobSession = mobSession;
 }
 
 

@@ -70,7 +70,7 @@ public class Validate extends Fragment {
                                     .addHeader("Content-Type", "application/json").build();
                             return chain.proceed(request);
                         }).build();
-        retrofit =   new Retrofit.Builder().baseUrl(APIUrl.BASE_URL).addConverterFactory
+        retrofit =   new Retrofit.Builder().baseUrl(HomePage.url).addConverterFactory
                 (GsonConverterFactory.create())
                 .client(defaulthttpClient)
                 .build();

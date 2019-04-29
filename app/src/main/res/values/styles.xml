@@ -29,6 +29,9 @@
     <style name="CalenderViewDateCustomText" parent="android:TextAppearance.DeviceDefault.Small">
         <item name="android:textColor">@color/navy</item>
     </style>
-
+    <style name="popupanimation">
+        <item name="android:windowEnterAnimation">@anim/slide_ups</item>
+        <item name="android:windowExitAnimation">@anim/slide_down</item>
+    </style>
 
 </resources>

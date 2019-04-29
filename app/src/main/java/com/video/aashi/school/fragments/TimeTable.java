@@ -3,6 +3,7 @@ package com.video.aashi.school.fragments;
 
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Color;
@@ -39,8 +40,10 @@ import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
 import com.video.aashi.school.APIUrl;
 import com.video.aashi.school.MainActivity;
 import com.video.aashi.school.Navigation;
+import com.video.aashi.school.PinLogin;
 import com.video.aashi.school.R;
 import com.video.aashi.school.adapters.ApiClient;
+import com.video.aashi.school.adapters.Expired;
 import com.video.aashi.school.adapters.Interfaces.MyInterface;
 import com.video.aashi.school.adapters.calenders.MySelectorDecorator;
 import com.video.aashi.school.adapters.calenders.OneDayDecorators;
@@ -142,7 +145,7 @@ LinearLayout views;
 
                             }
                         }).build();
-        retrofit =   new Retrofit.Builder().baseUrl(APIUrl.BASE_URL).addConverterFactory
+        retrofit =   new Retrofit.Builder().baseUrl(HomePage.url).addConverterFactory
                 (GsonConverterFactory.create())
                 .client(defaulthttpClient)
                 .build();
@@ -280,7 +283,8 @@ LinearLayout views;
     @Override
     protected String doInBackground(final String... strings) {
         retrofit2.Call<ResponseBody> responseBodyCall =
-                myInterface.getTimetable(new com.video.aashi.school.adapters.post_class.TimeTable(classid,acayear,locid));
+                myInterface.getTimetable(new com.video.aashi.school.adapters.post_class.TimeTable(
+                        classid,acayear,locid,Navigation.loginId,Navigation.session));
         responseBodyCall.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response)
@@ -320,9 +324,24 @@ LinearLayout views;
                           views.removeAllViews();
                           JSONObject object = new JSONObject(bodyString);
                           JSONArray list = object.getJSONArray("Student TimeTable Details");
+                          String   failure = object.getString("status");
+                         String  errorMessage = object.getString("errorMessage");
+                          if  (failure.contains("failure")) {
+                              String finalErrorMessage = errorMessage;
+                              Expired expired = new Expired(getActivity(), finalErrorMessage);
+                              expired.setTitle(finalErrorMessage);
+                              expired.setCancelable(false);
+
+                              expired.setPositiveButton("OK", (dialog1, which) -> {
+                                  expired.getSharedPreferences();
+                                  Intent i = new Intent(getActivity(), PinLogin.class);
+                                  i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                  startActivity(i);
+                              });
+                              expired.show();
+                          }
                           for (int i = 0; i < list.length(); i++) {
                               JSONObject data = list.getJSONObject(i);
-
                               JSONObject jsonObject = data.getJSONObject("period1Dtl");
                               String  day_name = data.getString("dayName");
                               if (day_name.equals(dates))

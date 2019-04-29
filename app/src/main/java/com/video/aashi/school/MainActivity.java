@@ -37,7 +37,8 @@ import com.video.aashi.school.fragments.TimeTable;
 
 import java.util.Arrays;
 
-public class MainActivity extends AppCompatActivity implements DrawerAdapter.OnItemSelectedListener {
+public class MainActivity extends AppCompatActivity
+        implements DrawerAdapter.OnItemSelectedListener {
     String username,user_image;
     SharedPreferences sharedPreferences;
     DrawerAdapter adapter;

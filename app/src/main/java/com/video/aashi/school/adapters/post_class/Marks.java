@@ -6,8 +6,9 @@ public class Marks {
     String classId;
     String studentId;
     String accademicYearId;
-
-    public Marks(String examGroupId,String locId,String classId,String studentId,String accademicYearId)
+    String parentLoginCode;
+    String mobSession;
+    public Marks(String examGroupId,String locId,String classId,String studentId,String accademicYearId,String parentLoginCode,String mobSession)
 
     {
         this.examGroupId = examGroupId;
@@ -15,5 +16,7 @@ public class Marks {
         this.classId = classId;
         this.studentId = studentId;
         this.accademicYearId = accademicYearId;
+        this.parentLoginCode = parentLoginCode;
+        this.mobSession = mobSession;
     }
 }

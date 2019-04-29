@@ -3,6 +3,7 @@ package com.video.aashi.school.fragments;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -25,7 +26,9 @@ import android.widget.Toast;
 import com.video.aashi.school.APIUrl;
 import com.video.aashi.school.MainActivity;
 import com.video.aashi.school.Navigation;
+import com.video.aashi.school.PinLogin;
 import com.video.aashi.school.R;
+import com.video.aashi.school.adapters.Expired;
 import com.video.aashi.school.adapters.Interfaces.MyInterface;
 import com.video.aashi.school.adapters.post_class.Memo;
 
@@ -97,7 +100,7 @@ public class PtaMee extends Fragment
         logging.setLevel(HttpLoggingInterceptor.Level.BODY);
         OkHttpClient client = new OkHttpClient.Builder().addInterceptor(logging).build();
 
-        retrofit =   new Retrofit.Builder().baseUrl(APIUrl.BASE_URL).addConverterFactory
+        retrofit =   new Retrofit.Builder().baseUrl(HomePage.url ).addConverterFactory
                 (GsonConverterFactory.create())
                 .client(client)
                 .build();
@@ -145,14 +148,11 @@ public class PtaMee extends Fragment
         }
         @Override
         protected Object doInBackground(Object[] objects) {
-            Call<ResponseBody> call = myInterface.getPta(new Memo(classId,studentId,locId,classGeneralId));
+            Call<ResponseBody> call = myInterface.getPta(new Memo(classId,studentId,locId,classGeneralId,Navigation.loginId,Navigation.session));
             call.enqueue(new Callback<ResponseBody>() {
                 @Override
                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                    String bodyString;
-
-
-
+                   String bodyString;
                    if (!response.isSuccessful())
                    {
                        Toast.makeText(getActivity(),"Something went wrong..!!",Toast.LENGTH_SHORT).show();
@@ -162,6 +162,22 @@ public class PtaMee extends Fragment
                        try {
                            bodyString  = response.body().toString();
                            JSONObject object = new JSONObject(bodyString);
+                           String   failure = object.getString("status");
+                           String  errorMessage = object.getString("errorMessage");
+                           if  (failure.contains("failure")) {
+                               String finalErrorMessage = errorMessage;
+                               Expired expired = new Expired(getActivity(), finalErrorMessage);
+                               expired.setTitle(finalErrorMessage);
+                               expired.setCancelable(false);
+
+                               expired.setPositiveButton("OK", (dialog1, which) -> {
+                                   expired.getSharedPreferences();
+                                   Intent i = new Intent(getActivity(), PinLogin.class);
+                                   i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                   startActivity(i);
+                               });
+                               expired.show();
+                           }
                            JSONArray list = object.getJSONArray("PTA Details");
                            if (list.length() != 0)
                            {
@@ -297,8 +313,8 @@ public class PtaMee extends Fragment
             //We need to get the instance of the LayoutInflater, use the context of this activity
 
             View popupView =  LayoutInflater.from(getActivity()).inflate(R.layout.memoview,
-                    (ViewGroup)getView(). findViewById(R.id.
-                            popupwindow));
+                    (ViewGroup)
+                   getView(). findViewById(R.id.popupwindow));
             final PopupWindow popupWindow = new PopupWindow(popupView,
                     LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
             validupto =(TextView)popupView.findViewById(R.id.valid);

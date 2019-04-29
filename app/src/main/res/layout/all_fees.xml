@@ -138,6 +138,7 @@
                         android:layout_height="wrap_content"
                         />
                     <android.support.v7.widget.CardView
+                        android:visibility="gone"
                         android:id="@+id/paynow"
                         app:cardBackgroundColor="@color/flutter_blue"
                         android:layout_margin="4dp"

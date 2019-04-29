@@ -3,6 +3,7 @@ package com.video.aashi.school.fragments;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -36,8 +37,10 @@ import com.video.aashi.school.APIUrl;
 import com.video.aashi.school.MainActivity;
 import com.video.aashi.school.Navigation;
 import com.video.aashi.school.Performance;
+import com.video.aashi.school.PinLogin;
 import com.video.aashi.school.R;
 import com.video.aashi.school.adapters.BarView;
+import com.video.aashi.school.adapters.Expired;
 import com.video.aashi.school.adapters.Interfaces.MyInterface;
 import com.video.aashi.school.adapters.arrar_adapterd.ExamArray;
 import com.video.aashi.school.adapters.arrar_adapterd.MarksArray;
@@ -90,17 +93,12 @@ public class Charts extends Fragment {
   String mypercent;
  int myroundoff;
     List<Integer> myList = new ArrayList<Integer>();
-
     List<Integer> myLists = new ArrayList<Integer>();
     List<MarksArray> marksArrays= new ArrayList<>();
-
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
         View view = inflater.inflate(R.layout.fragment_charts, container, false);
-
         studentame =(TextView)view.findViewById(R.id.student_name);
         studentame.setText(HomePage.userName);
         recyclerView =(RecyclerView)view.findViewById(R.id.charts_recycle);
@@ -111,7 +109,6 @@ public class Charts extends Fragment {
         classId = Navigation.class_id ;
         studentId    = Navigation.student_id;
         accademicYearId = Navigation.academicyear;
-
         studentid =(TextView)view.findViewById(R.id.myid);
         groupname =(TextView)view.findViewById(R.id.groups);
         termname =(TextView)view.findViewById(R.id.termname);
@@ -130,10 +127,9 @@ public class Charts extends Fragment {
                                 Request request = chain.request().newBuilder()
                                         .addHeader("Content-Type", "application/json").build();
                                 return chain.proceed(request);
-
                             }
                         }).build();
-        retrofit =   new Retrofit.Builder().baseUrl(APIUrl.BASE_URL).addConverterFactory
+        retrofit =   new Retrofit.Builder().baseUrl(HomePage.url).addConverterFactory
                 (GsonConverterFactory.create())
                 .client(defaulthttpClient)
                 .build();
@@ -150,13 +146,11 @@ public class Charts extends Fragment {
         menu.clear();
         super.onCreateOptionsMenu(menu, inflater);
     }
-
     class getMarks extends AsyncTask
     {
-
         @Override
         protected Object doInBackground(Object[] objects) {
-            Call<ResponseBody> call = myInterface.getMarks(new Marks(examGroupId,locId,classId,studentId,accademicYearId));
+            Call<ResponseBody> call = myInterface.getMarks(new Marks(examGroupId,locId,classId,studentId,accademicYearId,Navigation.loginId,Navigation.session));
             call.enqueue(new Callback<ResponseBody>() {
                 @Override
                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
@@ -171,12 +165,27 @@ public class Charts extends Fragment {
                         {
                             e.printStackTrace();
                         }
-
                         {
                             try {
-
                                 JSONObject object = new JSONObject(bodyString);
+                                String   failure = object.getString("status");
+                                String  errorMessage = object.getString("errorMessage");
+                                if  (failure.contains("failure"))
+                                {
+                                    String finalErrorMessage = errorMessage;
+                                    Expired expired = new Expired(getActivity(), finalErrorMessage);
+                                    expired.setTitle(finalErrorMessage);
+                                    expired.setCancelable(false);
+                                    expired.setPositiveButton("OK", (dialog1, which) -> {
+                                        expired.getSharedPreferences();
+                                        Intent i = new Intent(getActivity(), PinLogin.class);
+                                        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                        startActivity(i);
+                                    });
+                                    expired.show();
+                                }
                                 JSONArray list = object.getJSONArray("Student Performance Chart Data");
+
                                 for (int i = 0; i < list.length(); i++)
                                 {
                                     String marks,subject;
@@ -245,7 +254,9 @@ public class Charts extends Fragment {
         public void onBindViewHolder(@NonNull Viewholder viewholder, int i)
         {
             Random rnd = new Random();
-            int color = Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256));
+            int color =  Color.TRANSPARENT;
+//            int color = Color.argb(255, rnd.nextInt(256),
+//                    rnd.nextInt(256), rnd.nextInt(256));
             int toatMarks =Integer.valueOf(Performance.maxmarks);
             int finalMark = 0;
             int average =Integer.parseInt(list.get(i).getStudAverage());
@@ -274,6 +285,35 @@ public class Charts extends Fragment {
             {
                 finalMark = average/2;
             }
+
+            if (finalMark  <= 30)
+            {
+                color = Color.RED;
+            }
+            else if (finalMark >  31 && finalMark<=39)
+            {
+                color = Color.parseColor("#FFA500");
+            }
+            else if (finalMark >  40 && finalMark<=49)
+            {
+                color  = Color.YELLOW;
+            }
+            else  if (finalMark >  50 && finalMark<=59)
+            {
+                color  = Color.parseColor("#FFC0CB");
+            }
+            else  if (finalMark >=  60 && finalMark<=69)
+            {
+                color  = Color.BLUE;
+            }
+            else  if (finalMark >  70 && finalMark<=79)
+            {
+                color  = Color.parseColor("#800080");
+            }
+            else  if (finalMark >  80 && finalMark<=100)
+            {
+                color  = Color.parseColor("#008000");
+            }
             viewholder.mLowBar.set(color, finalMark);
             viewholder.textView.setText(list.get(i).getSubjectName());
             viewholder.low_text.setText(getPercentage(finalMark));
@@ -281,16 +321,17 @@ public class Charts extends Fragment {
             total.setText(totalmark);
             if (toatMarks == 0)
             {
-
             }
+
             String taa = null;
             addMember(finalMark);
             addMembers(values);
-             taa = String.valueOf(myroundoff);
+            taa = String.valueOf(myroundoff);
             String my = String.valueOf(myLists.stream().mapToInt(value -> value).sum());
             Log.i("Tag","MyAdd"+ myList+my);
             percent.setText(myList.stream().mapToInt(value -> value).sum() /list.size()+ "%");
             roundoff.setText(my);
+
         }
         @Override
         public long getItemId(int position) {
@@ -307,15 +348,14 @@ public class Charts extends Fragment {
     }
     public static class Viewholder extends RecyclerView.ViewHolder
     {
-       BarView mLowBar;
-         TextView textView,low_text;
+        BarView mLowBar;
+        TextView textView,low_text;
         public Viewholder(@NonNull View itemView)
         {
             super(itemView);
             low_text=(TextView)itemView.findViewById(R.id.low_text);
             mLowBar = (BarView)itemView. findViewById(R.id.low_bar);
             textView =(TextView)itemView.findViewById(R.id.textforchart);
-
         }
     }
     private String getPercentage(int per) {
@@ -324,11 +364,8 @@ public class Charts extends Fragment {
     @SuppressLint("NewApi")
     public void addMember(Integer x) {
         myList.add(x);
-
     };
     public void addMembers(Integer x) {
         myLists.add(x);
-
     };
-
 }

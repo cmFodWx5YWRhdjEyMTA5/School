@@ -30,7 +30,7 @@
             <EditText
 
                 android:inputType="number"
-                android:maxLength="4"
+                android:maxLength="6"
                 android:id="@+id/enters"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -55,7 +55,7 @@
 
             <EditText
                 android:inputType="number"
-                android:maxLength="4"
+                android:maxLength="6"
                 android:id="@+id/reenters"
                 android:textColor="@color/flutter_blue"
                 android:hint="Re-enter pin"

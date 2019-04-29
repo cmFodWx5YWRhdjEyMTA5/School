@@ -34,6 +34,7 @@ import com.video.aashi.school.R;
 import com.video.aashi.school.adapters.Interfaces.MyInterface;
 import com.video.aashi.school.adapters.arrar_adapterd.Invoice_array;
 import com.video.aashi.school.adapters.post_class.Invoic;
+import com.video.aashi.school.fragments.HomePage;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -101,7 +102,7 @@ public class UnPaid extends Fragment {
 
                             }
                         }).build();
-        retrofit =   new Retrofit.Builder().baseUrl(APIUrl.BASE_URL).addConverterFactory
+        retrofit =   new Retrofit.Builder().baseUrl(HomePage.url).addConverterFactory
                 (GsonConverterFactory.create())
                 .client(defaulthttpClient)
                 .build();
@@ -123,90 +124,6 @@ public class UnPaid extends Fragment {
     }
 
 
-/*    class getPaid extends AsyncTask
-    {
-        ProgressDialog progressDialog;
-        @Override
-        protected void onPreExecute()
-        {
-            progressDialog = new ProgressDialog(getActivity());
-            progressDialog.setMessage("Loading");
-            progressDialog.setCancelable(false);
-            progressDialog.show();
-            super.onPreExecute();
-        }
-        @Override
-        protected Object doInBackground(Object[] objects)
-        {
-            HashMap<String, String> params = new HashMap<String, String>();
-            requestQueue = Volley.newRequestQueue(getActivity());
-            params.put("studentId",studentid);
-            params.put("classId",classid);
-            params.put("locId",locationid);
-            final String URL = APIUrl.BASE_URL +"getStudentInvoicesForParentLogin";
-            JsonObjectRequest request_json = new JsonObjectRequest(URL, new JSONObject(params),
-                    new com.android.volley.Response.Listener<JSONObject>() {
-                        @Override
-                        public void onResponse(JSONObject response) {
-                        Log.i("Tag","Hellopaid"+ response );
-
-                            try {
-
-                                JSONObject object = new JSONObject(response.toString());
-                                JSONArray list = object.getJSONArray("Student Invoice Details");
-                                for(int i=0;i<list.length();i++)
-                                {
-                                    if (list.length() != 0)
-                                    {
-                                        JSONObject data = list.getJSONObject(i);
-                                        paid = data.getString("paid");
-                                        if (paid.contains("N"))
-                                        {
-                                            accountName = data.getString("accountName");
-                                            bankName = data.getString("bankName");
-                                            basicAmount = data.getString("basicAmount");
-                                            chequePayment = data.getString("chequePayment");
-                                            invoiceDtDisp = data.getString("invoiceDtDisp");
-                                            invoiceHdrName = data.getString("invoiceHdrName");
-                                            invoiceStatusDisp = data.getString("invoiceStatusDisp");
-                                            paidAmount = data.getString("paidAmount");
-                                            //  itemName  = data.getString("itemName");
-                                            invoice_arrays.add(new Invoice_array(accountName,bankName,basicAmount,chequePayment,invoiceDtDisp,invoiceHdrName,
-                                                    invoiceStatusDisp,paidAmount,paid));
-                                    }
-                                        progressDialog.dismiss();
-                                    }
-                                    else
-                                    {
-                                    }
-                                }
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-
-                            progressDialog.dismiss();
-                        }
-                    },
-                    new com.android.volley.Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            VolleyLog.e("Error: ", error.getMessage());
-                            Toast.makeText(getActivity(), "Error: " + error.getMessage(), Toast.LENGTH_LONG).show();
-                        }
-                    });
-                  requestQueue.add(request_json);
-
-            return null;
-        }
-
-
-
-
-
-
-    }
-
-*/
 static class Paidadapterr extends RecyclerView.Adapter<Viewholder> {
 
 

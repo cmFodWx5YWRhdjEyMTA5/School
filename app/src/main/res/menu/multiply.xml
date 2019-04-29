@@ -10,11 +10,21 @@
         android:actionLayout="@layout/layout"
         app:showAsAction="always" />
     <item
+        android:visible="false"
         android:menuCategory="container"
         android:title=""
         android:orderInCategory="1"
         android:id="@+id/qrcode"
         android:icon="@drawable/ic_qr_code"
+        app:showAsAction="ifRoom" />
+    <item
+
+        android:menuCategory="container"
+        android:title=""
+        android:visible="false"
+        android:orderInCategory="1"
+        android:id="@+id/switchs"
+        android:icon="@drawable/ic_change"
         app:showAsAction="ifRoom" />
 
     <item

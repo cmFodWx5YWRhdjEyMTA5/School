@@ -23,6 +23,7 @@ import com.video.aashi.school.R;
 import com.video.aashi.school.adapters.Interfaces.MyInterface;
 import com.video.aashi.school.adapters.arrar_adapterd.Holiday_adapter;
 import com.video.aashi.school.adapters.post_class.Hols;
+import com.video.aashi.school.fragments.HomePage;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -86,7 +87,7 @@ public class Weekoffs extends Fragment {
 
                             }
                         }).build();
-        retrofit = new Retrofit.Builder().baseUrl(APIUrl.BASE_URL).addConverterFactory
+        retrofit = new Retrofit.Builder().baseUrl(HomePage.url).addConverterFactory
                 (GsonConverterFactory.create())
                 .client(defaulthttpClient)
                 .build();
@@ -116,7 +117,7 @@ public class Weekoffs extends Fragment {
         @Override
         protected Object doInBackground(Object[] objects) {
 
-            Call<ResponseBody> call = loginInterface.getHolidays(new Hols(year_id, general_id, loc_id));
+            Call<ResponseBody> call = loginInterface.getHolidays(new Hols(year_id, general_id, loc_id,Navigation.loginId,Navigation.session));
             call.enqueue(new Callback<ResponseBody>() {
                 @Override
                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
